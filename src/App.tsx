@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useRef, lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import Lenis from "lenis";
 import gsap from "gsap";
@@ -12,12 +12,12 @@ import Preloader from "./components/Preloader";
 import { usePreloader } from "./hooks/usePreloader";
 import { PreloaderProvider } from "./context/PreloaderContext";
 
-import Home from "./pages/Home";
-import Work from "./pages/Work";
-import ProjectDetail from "./pages/ProjectDetail";
-import Studio from "./pages/Studio";
-import Process from "./pages/Process";
-import Contact from "./pages/Contact";
+const Home = lazy(() => import("./pages/Home"));
+const Work = lazy(() => import("./pages/Work"));
+const ProjectDetail = lazy(() => import("./pages/ProjectDetail"));
+const Studio = lazy(() => import("./pages/Studio"));
+const Process = lazy(() => import("./pages/Process"));
+const Contact = lazy(() => import("./pages/Contact"));
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -125,15 +125,17 @@ function AppShell() {
           <div className="grain" />
           <PageTransition />
           <ScrollToTop />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/work" element={<Work />} />
-            <Route path="/work/:slug" element={<ProjectDetail />} />
-            <Route path="/studio" element={<Studio />} />
-            <Route path="/process" element={<Process />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="*" element={<Home />} />
-          </Routes>
+          <Suspense fallback={null}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/work" element={<Work />} />
+              <Route path="/work/:slug" element={<ProjectDetail />} />
+              <Route path="/studio" element={<Studio />} />
+              <Route path="/process" element={<Process />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="*" element={<Home />} />
+            </Routes>
+          </Suspense>
           <Footer />
         </PreloaderProvider>
       )}

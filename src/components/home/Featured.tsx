@@ -1,7 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { PROJECTS } from "../../data/projects";
-import ProjectImage from "../../components/ProjectImage";
+import { lazy, Suspense } from "react";
+const ProjectImage = lazy(() => import("../../components/ProjectImage"));
 import { Magnetic, Scramble } from "../../components/Motion";
 import { useTilt, useClipReveal, useReveal } from "../../motion";
 
@@ -17,12 +18,14 @@ export const FeaturedCard = React.memo(function FeaturedCard({ p, i }: { p: type
       }}
       to={`/work/${p.slug}`}
       className={`tilt-card group relative overflow-hidden block ${
-        i === 0 ? "md:col-span-7 aspect-[4/3]" : i === 1 ? "md:col-span-5 aspect-[4/3]" : "md:col-span-12 aspect-[21/9]"
+        i === 0 ? "md:col-span-12 lg:col-span-7 aspect-[4/3]" : i === 1 ? "md:col-span-12 lg:col-span-5 aspect-[4/3]" : "md:col-span-12 aspect-[21/9]"
       }`}
       data-cursor="hover"
     >
       <div className="absolute inset-0 project-img">
-        <ProjectImage src={p.thumbnail} active={false} />
+        <Suspense fallback={<div className="w-full h-full bg-[var(--mute)]" />}>
+          <ProjectImage src={p.thumbnail} active={false} />
+        </Suspense>
       </div>
       <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
       <div className="relative z-10 h-full flex flex-col justify-end p-6 md:p-10">

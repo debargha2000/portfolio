@@ -199,7 +199,7 @@ function TeamList({ team }: { team: { n: string; r: string; b: string; img: stri
         className={`team-portrait ${portrait ? "is-open" : ""}`}
         style={{ transform: "translate3d(-50%, -50%, 0) scale(1)" }}
       >
-        {portrait && <img src={portrait.img} alt="" className="w-full h-full object-cover" />}
+        {portrait && <img src={portrait.img} alt="" loading="lazy" className="w-full h-full object-cover" />}
       </div>
     </>
   );
