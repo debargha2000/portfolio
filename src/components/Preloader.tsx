@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import gsap from "gsap";
+import type { PreloadTask } from "../hooks/usePreloader";
 
 interface Props {
   progress: number;
@@ -7,6 +8,8 @@ interface Props {
   onDone: () => void;
   failedTasks: string[];
   onRetry: () => void;
+  tasks: PreloadTask[];
+  taskProgress: Record<string, { loaded: number; total: number; percentage: number }>;
 }
 
 type Stage = 'downloading' | 'complete' | 'idle';
@@ -16,7 +19,9 @@ export default function Preloader({
   isComplete, 
   onDone, 
   failedTasks, 
-  onRetry 
+  onRetry,
+  tasks,
+  taskProgress
 }: Props) {
   const [displayComplete, setDisplayComplete] = useState(false);
   const [showRetry, setShowRetry] = useState(false);
@@ -60,7 +65,7 @@ export default function Preloader({
   useEffect(() => {
     if (progress < 98) {
       setStage('downloading');
-      setStageText('Downloading video');
+      setStageText('Pre-rendering assets');
     } else {
       setStage('complete');
       setStageText('Ready');
@@ -125,9 +130,23 @@ export default function Preloader({
         </span>
       </div>
 
-      <div ref={stageEl} className="absolute bottom-8 left-8 right-8 text-xs uppercase tracking-widest text-[var(--acid)]/80 opacity-0 transition-opacity duration-500" style={{ transform: stage === 'complete' ? 'translateY(0)' : 'translateY(10px)' }}>
-        {stage === 'downloading' && 'Caching full video for zero-stutter playback'}
-        {stage === 'complete' && 'All assets ready — entering'}
+      <div ref={stageEl} className="absolute bottom-16 left-8 text-xs uppercase tracking-widest font-mono transition-opacity duration-500" style={{ opacity: stage === 'complete' ? 0 : 1 }}>
+        <div className="flex flex-col gap-1.5">
+          {tasks.map((task) => {
+            const tp = taskProgress[task.id];
+            const pct = tp ? tp.percentage : 0;
+            return (
+              <div key={task.id} className="flex items-center gap-4 transition-colors duration-300">
+                <span className="w-10 tabular-nums text-right opacity-60">
+                  [{String(pct).padStart(3, '\u00A0')}%]
+                </span>
+                <span className={pct === 100 ? "text-[var(--acid)]" : "text-[var(--bone)]/40"}>
+                  {task.name}
+                </span>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {showRetry && (

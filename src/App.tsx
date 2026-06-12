@@ -63,7 +63,9 @@ function AppShell() {
     start,
     heroVideoResult,
     failedTasks,
-    retryFailed
+    retryFailed,
+    tasks,
+    taskProgress
   } = usePreloader();
   
   const [showApp, setShowApp] = useState(false);
@@ -117,6 +119,8 @@ function AppShell() {
           onDone={handlePreloaderDone}
           failedTasks={failedTasks}
           onRetry={retryFailed}
+          tasks={tasks}
+          taskProgress={taskProgress}
         />
       )}
       {showApp && (
