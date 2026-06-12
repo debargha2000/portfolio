@@ -6,7 +6,16 @@ import { useMagnetic } from "../motion";
 export default function Nav() {
   const mag = useMagnetic<HTMLAnchorElement>(0.4);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 0);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   useEffect(() => {
     setMenuOpen(false);
@@ -23,7 +32,7 @@ export default function Nav() {
 
   return (
     <>
-    <nav className="fixed top-0 left-0 right-0 z-50 px-6 md:px-10 py-6 flex items-center justify-between mix-blend-difference">
+    <nav className={`fixed top-0 left-0 right-0 z-50 px-6 md:px-10 py-6 flex items-center justify-between mix-blend-difference transition-all duration-300 ${scrolled ? "backdrop-blur-[5px]" : ""}`}>
       <Link to="/" className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.22em] font-medium">
         <span className="inline-block w-2 h-2 rounded-full bg-[var(--orange)] spin-slow" />
         <Scramble>KAIDO</Scramble>
