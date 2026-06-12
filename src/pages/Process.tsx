@@ -132,7 +132,7 @@ function Movement({ m }: { m: any; i: number }) {
       { opacity: 0, x: 40 },
       {
         opacity: 1, x: 0, duration: 0.8, ease: "expo.out", stagger: 0.05,
-        scrollTrigger: { trigger: panelRef.current, start: "top 70%" },
+        scrollTrigger: { trigger: panelRef.current, start: "top 70%", toggleActions: "play none none reverse" },
       }
     );
   }, []);
@@ -218,7 +218,7 @@ function FAQItem({ f, i }: { f: { q: string; a: string }; i: number }) {
       { opacity: 0, y: 30 },
       {
         opacity: 1, y: 0, duration: 0.8, ease: "expo.out", delay: i * 0.08,
-        scrollTrigger: { trigger: ref.current, start: "top 90%" },
+        scrollTrigger: { trigger: ref.current, start: "top 90%", toggleActions: "play none none reverse" },
       }
     );
   }, [i]);

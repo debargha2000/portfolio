@@ -79,7 +79,6 @@ export function useNumberFlip(target: number, duration = 1.5) {
     const st = ScrollTrigger.create({
       trigger: ref.current,
       start: "top 85%",
-      once: true,
       onEnter: () => {
         const startTime = Date.now();
         const animate = () => {
@@ -92,6 +91,9 @@ export function useNumberFlip(target: number, duration = 1.5) {
         };
         animate();
       },
+      onLeaveBack: () => {
+        setDisplay("0");
+      }
     });
     return () => st.kill();
   }, [target, duration]);
@@ -107,7 +109,6 @@ export function useCircleReveal<T extends HTMLElement>(delay = 0) {
     const st = ScrollTrigger.create({
       trigger: ref.current,
       start: "top 85%",
-      once: true,
       onEnter: () => {
         gsap.to(ref.current, {
           clipPath: "circle(150% at 50% 50%)",
@@ -116,6 +117,9 @@ export function useCircleReveal<T extends HTMLElement>(delay = 0) {
           delay,
         });
       },
+      onLeaveBack: () => {
+        gsap.set(ref.current, { clipPath: "circle(0% at 50% 50%)" });
+      }
     });
     return () => st.kill();
   }, [delay]);
@@ -281,7 +285,6 @@ export function useCountUp(target: number, duration = 1.6, decimals = 0, start =
     const st = ScrollTrigger.create({
       trigger: ref.current,
       start: "top 85%",
-      once: true,
       onEnter: () => {
         gsap.to(obj, {
           v: target,
@@ -290,6 +293,11 @@ export function useCountUp(target: number, duration = 1.6, decimals = 0, start =
           onUpdate: () => setVal(Number(obj.v.toFixed(decimals))),
         });
       },
+      onLeaveBack: () => {
+        gsap.killTweensOf(obj);
+        obj.v = start;
+        setVal(start);
+      }
     });
     return () => st.kill();
   }, [target, duration, decimals, start]);
@@ -383,7 +391,6 @@ export function useReveal<T extends HTMLElement>(delay = 0) {
     const st = ScrollTrigger.create({
       trigger: ref.current,
       start: "top 88%",
-      once: true,
       onEnter: () => {
         gsap.fromTo(
           ref.current,
@@ -391,6 +398,9 @@ export function useReveal<T extends HTMLElement>(delay = 0) {
           { opacity: 1, y: 0, duration: 1.1, ease: "expo.out", delay }
         );
       },
+      onLeaveBack: () => {
+        gsap.set(ref.current, { opacity: 0, y: 60 });
+      }
     });
     return () => st.kill();
   }, [delay]);
@@ -412,7 +422,6 @@ export function useClipReveal<T extends HTMLElement>(variant: "circle" | "h" | "
     const st = ScrollTrigger.create({
       trigger: ref.current,
       start: "top 85%",
-      once: true,
       onEnter: () => {
         gsap.to(ref.current, {
           clipPath: "inset(0 0 0 0)",
@@ -421,6 +430,9 @@ export function useClipReveal<T extends HTMLElement>(variant: "circle" | "h" | "
           delay,
         });
       },
+      onLeaveBack: () => {
+        gsap.set(ref.current, { clipPath: initial });
+      }
     });
     return () => st.kill();
   }, [variant, delay]);

@@ -36,7 +36,7 @@ export default function Nav() {
       <Link to="/" className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.22em] font-medium">
         <span className="inline-block w-2 h-2 rounded-full bg-[var(--orange)] spin-slow" />
         <Scramble>DEBARGHA</Scramble>
-        <span className="font-editorial italic text-base lowercase ml-0.5 normal-case tracking-normal">Moriatry</span>
+        <span className="font-editorial italic text-base lowercase ml-0.5 normal-case tracking-normal text-[var(--acid)]">Moriarty</span>
       </Link>
 
       <ul className="hidden md:flex items-center gap-8 font-mono text-[10px] uppercase tracking-[0.25em] font-medium">

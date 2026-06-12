@@ -51,7 +51,7 @@ export const CASColumn = React.memo(function CASColumn({ s, i }: { s: { n: strin
       { opacity: 0, y: 60 },
       {
         opacity: 1, y: 0, duration: 1, ease: "expo.out", delay: i * 0.15,
-        scrollTrigger: { trigger: ref.current, start: "top 85%" },
+        scrollTrigger: { trigger: ref.current, start: "top 85%", toggleActions: "play none none reverse" },
       }
     );
   }, [i]);
@@ -73,14 +73,20 @@ export const CreditRow = React.memo(function CreditRow({ c, i }: { c: { role: st
       { opacity: 0, x: -30 },
       {
         opacity: 1, x: 0, duration: 0.8, ease: "expo.out", delay: i * 0.06,
-        scrollTrigger: { trigger: ref.current, start: "top 90%" },
+        scrollTrigger: { trigger: ref.current, start: "top 90%", toggleActions: "play none none reverse" },
       }
     );
   }, [i]);
   return (
     <li ref={ref} className="py-4 flex justify-between items-baseline gap-4 group hover:bg-[var(--acid)]/5 transition-colors px-2 -mx-2">
       <span className="text-xs uppercase tracking-widest text-[var(--bone)]/50 group-hover:text-[var(--acid)] transition-colors">{c.role}</span>
-      <span className="font-display text-2xl md:text-3xl text-right group-hover:translate-x-2 transition-transform">{c.name}</span>
+      <span className="font-display text-2xl md:text-3xl text-right group-hover:translate-x-2 transition-transform">
+        {c.name.split(" ").map((word, idx, arr) => (
+          <span key={idx} className={word === "Moriarty" ? "text-[var(--orange)]" : ""}>
+            {word}{idx < arr.length - 1 ? " " : ""}
+          </span>
+        ))}
+      </span>
     </li>
   );
 });

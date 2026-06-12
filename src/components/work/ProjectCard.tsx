@@ -26,7 +26,7 @@ export const ProjectCard = React.memo(function ProjectCard({ p, i }: { p: typeof
         duration: 1.1,
         ease: "expo.out",
         delay: (i % 3) * 0.1,
-        scrollTrigger: { trigger: el, start: "top 90%" },
+        scrollTrigger: { trigger: el, start: "top 90%", toggleActions: "play none none reverse" },
       }
     );
   }, [i]);

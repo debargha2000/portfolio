@@ -14,12 +14,14 @@ export const PressQuote = React.memo(function PressQuote({ q, i }: { q: { q: str
     ScrollTrigger.create({
       trigger: ref.current,
       start: "top 85%",
-      once: true,
       onEnter: () => {
         gsap.to(chars, {
           opacity: 1, y: 0, duration: 0.4, ease: "power2.out", stagger: 0.008 + i * 0.002,
         });
       },
+      onLeaveBack: () => {
+        gsap.set(chars, { opacity: 0, y: 10 });
+      }
     });
   }, [i]);
 

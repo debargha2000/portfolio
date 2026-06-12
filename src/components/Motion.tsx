@@ -25,7 +25,6 @@ export function CharReveal({
     ScrollTrigger.create({
       trigger: ref.current,
       start: "top 88%",
-      once: true,
       onEnter: () => {
         gsap.to(chars, {
           yPercent: 0,
@@ -35,6 +34,9 @@ export function CharReveal({
           stagger,
         });
       },
+      onLeaveBack: () => {
+        gsap.set(chars, { yPercent: 115, opacity: 0 });
+      }
     });
   }, [stagger]);
 
@@ -75,7 +77,6 @@ export function WordReveal({
     ScrollTrigger.create({
       trigger: ref.current,
       start: "top 85%",
-      once: true,
       onEnter: () => {
         gsap.to(words, {
           yPercent: 0,
@@ -84,14 +85,20 @@ export function WordReveal({
           stagger: 0.04,
         });
       },
+      onLeaveBack: () => {
+        gsap.set(words, { yPercent: 115 });
+      }
     });
   }, []);
 
-  const nodes = children.split(" ").map((w, i) => (
+  const nodes = children.split(" ").map((w, i) => {
+    const isMoriarty = w.replace(/[^a-zA-Z]/g, '') === "Moriarty" || w.replace(/[^a-zA-Z]/g, '') === "Moriatry";
+    return (
     <span key={i} className="w inline-block overflow-hidden align-bottom mr-[0.25em]">
-      <span className="inline-block">{w}</span>
+      <span className={`inline-block ${isMoriarty ? "text-[var(--orange)]" : ""}`}>{w.replace("Moriatry", "Moriarty")}</span>
     </span>
-  ));
+    );
+  });
 
   const TagAny = Tag as any;
   return <TagAny ref={ref} className={className}>{nodes}</TagAny>;

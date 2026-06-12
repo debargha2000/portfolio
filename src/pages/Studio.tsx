@@ -9,10 +9,10 @@ gsap.registerPlugin(ScrollTrigger);
 
 export default function Studio() {
   const bio =
-    "Debargha Moriatry founded the studio in 2021 after six years at Pentagram and Field. A designer by training, a writer by accident, and a programmer by stubbornness, he has spent the last decade trying to make things that behave like music — structured, elastic, and specific.";
+    "Debargha Moriarty founded the studio in 2021 after six years at Pentagram and Field. A designer by training, a writer by accident, and a programmer by stubbornness, he has spent the last decade trying to make things that behave like music — structured, elastic, and specific.";
 
   const team = [
-    { n: "Debargha Moriatry", r: "Founder, Creative Director", b: "Berlin / Cape Town", img: "https://images.pexels.com/photos/8005066/pexels-photo-8005066.jpeg?auto=compress&cs=tinysrgb&w=600" },
+    { n: "Debargha Moriarty", r: "Founder, Creative Director", b: "Berlin / Cape Town", img: "https://images.pexels.com/photos/8005066/pexels-photo-8005066.jpeg?auto=compress&cs=tinysrgb&w=600" },
     { n: "Noa Ferreira", r: "Design Director", b: "Berlin / Lisbon", img: "https://images.pexels.com/photos/7522451/pexels-photo-7522451.jpeg?auto=compress&cs=tinysrgb&w=600" },
     { n: "Jonas Weber", r: "Creative Code Lead", b: "Berlin", img: "https://images.pexels.com/photos/33551778/pexels-photo-33551778.jpeg?auto=compress&cs=tinysrgb&w=600" },
     { n: "Eli Cohen", r: "Type Director", b: "Tel Aviv / Berlin", img: "https://images.pexels.com/photos/14799384/pexels-photo-14799384.jpeg?auto=compress&cs=tinysrgb&w=600" },
@@ -187,7 +187,11 @@ function TeamList({ team }: { team: { n: string; r: string; b: string; img: stri
             data-cursor="hover"
           >
             <div className="col-span-12 md:col-span-6 font-display text-4xl md:text-6xl leading-none group-hover:translate-x-4 transition-transform duration-500">
-              {m.n}
+              {m.n.split(" ").map((word, idx, arr) => (
+                <span key={idx} className={word === "Moriarty" ? "text-[var(--orange)]" : ""}>
+                  {word}{idx < arr.length - 1 ? " " : ""}
+                </span>
+              ))}
             </div>
             <div className="col-span-7 md:col-span-4 text-sm text-[var(--bone)]/70 group-hover:text-[var(--acid)] transition-colors">{m.r}</div>
             <div className="col-span-5 md:col-span-2 text-xs uppercase tracking-widest text-[var(--bone)]/50 text-right group-hover:text-[var(--acid)] transition-colors">{m.b}</div>
@@ -244,7 +248,7 @@ function TimelineEvent({ e, i }: { e: { y: string; t: string }; i: number }) {
       { opacity: 0, y: 40, scale: 0.95 },
       {
         opacity: 1, y: 0, scale: 1, duration: 1, ease: "expo.out", delay: i * 0.1,
-        scrollTrigger: { trigger: ref.current, start: "top 85%" },
+        scrollTrigger: { trigger: ref.current, start: "top 85%", toggleActions: "play none none reverse" },
       }
     );
   }, [i]);

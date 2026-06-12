@@ -111,7 +111,7 @@ export default function Preloader({
       </div>
       <div className="absolute inset-x-8 bottom-[14vh] overflow-hidden">
         <div ref={line2} className="font-display italic text-[14vw] leading-[0.9] tracking-tight text-[var(--acid)]">
-          Moriarty<span className="text-[var(--bone)]">.</span>
+          <span className="text-[var(--acid)]">Moriarty</span><span className="text-[var(--bone)]">.</span>
         </div>
       </div>
 

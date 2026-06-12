@@ -30,7 +30,7 @@ export default function StudioTease() {
         duration: 0.9,
         ease: "expo.out",
         stagger: 0.03,
-        scrollTrigger: { trigger: bioRef.current, start: "top 75%" },
+        scrollTrigger: { trigger: bioRef.current, start: "top 75%", toggleActions: "play none none reverse" },
       }
     );
   }, []);

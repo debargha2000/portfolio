@@ -65,13 +65,15 @@ export const QuoteBlock = React.memo(function QuoteBlock({ b }: { b: CaseBlock }
     ScrollTrigger.create({
       trigger: ref.current,
       start: "top 85%",
-      once: true,
       onEnter: () => {
         gsap.to(chars, {
           opacity: 1, y: 0, rotateZ: 0,
           duration: 0.6, ease: "power2.out", stagger: 0.01,
         });
       },
+      onLeaveBack: () => {
+        gsap.set(chars, { opacity: 0, y: 20, rotateZ: () => gsap.utils.random(-3, 3) });
+      }
     });
   }, [b.text]);
 
