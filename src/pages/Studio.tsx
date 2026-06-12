@@ -9,10 +9,10 @@ gsap.registerPlugin(ScrollTrigger);
 
 export default function Studio() {
   const bio =
-    "Kaido Voss founded the studio in 2021 after six years at Pentagram and Field. A designer by training, a writer by accident, and a programmer by stubbornness, he has spent the last decade trying to make things that behave like music — structured, elastic, and specific.";
+    "Debargha Moriatry founded the studio in 2021 after six years at Pentagram and Field. A designer by training, a writer by accident, and a programmer by stubbornness, he has spent the last decade trying to make things that behave like music — structured, elastic, and specific.";
 
   const team = [
-    { n: "Kaido Voss", r: "Founder, Creative Director", b: "Berlin / Cape Town", img: "https://images.pexels.com/photos/8005066/pexels-photo-8005066.jpeg?auto=compress&cs=tinysrgb&w=600" },
+    { n: "Debargha Moriatry", r: "Founder, Creative Director", b: "Berlin / Cape Town", img: "https://images.pexels.com/photos/8005066/pexels-photo-8005066.jpeg?auto=compress&cs=tinysrgb&w=600" },
     { n: "Noa Ferreira", r: "Design Director", b: "Berlin / Lisbon", img: "https://images.pexels.com/photos/7522451/pexels-photo-7522451.jpeg?auto=compress&cs=tinysrgb&w=600" },
     { n: "Jonas Weber", r: "Creative Code Lead", b: "Berlin", img: "https://images.pexels.com/photos/33551778/pexels-photo-33551778.jpeg?auto=compress&cs=tinysrgb&w=600" },
     { n: "Eli Cohen", r: "Type Director", b: "Tel Aviv / Berlin", img: "https://images.pexels.com/photos/14799384/pexels-photo-14799384.jpeg?auto=compress&cs=tinysrgb&w=600" },

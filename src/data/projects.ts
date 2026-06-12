@@ -50,7 +50,7 @@ export const PROJECTS: Project[] = [
     solution:
       "Alongside the identity we shipped a web player where every track's visualisation is rendered live in WebGL. Fans can buy a physical record and a generative NFT of its field — two artefacts of the same piece. In the first six months the label sold out its first three pressings and was shortlisted for a D&AD Wood Pencil.",
     credits: [
-      { role: "Creative Direction", name: "Kaido Voss" },
+      { role: "Creative Direction", name: "Debargha Moriatry" },
       { role: "Design Lead", name: "Noa Ferreira" },
       { role: "Creative Code", name: "Jonas Weber" },
       { role: "Type Design", name: "Eli Cohen" },
@@ -120,7 +120,7 @@ export const PROJECTS: Project[] = [
     solution:
       "The site opens on a 12-second film, unfolds through six chapters, and closes on a private appointment booking for the Paris showroom. Conversion was never the metric — it was an application. SS25 sold out in eleven days; the microsite was featured on It's Nice That and nominated for an Awwwards SOTD.",
     credits: [
-      { role: "Creative Direction", name: "Kaido Voss" },
+      { role: "Creative Direction", name: "Debargha Moriatry" },
       { role: "Photography", name: "Helena Bonham Carter" },
       { role: "Styling", name: "Adèle Mercier" },
       { role: "Sound", name: "Yves Tumor" },
@@ -140,7 +140,7 @@ export const PROJECTS: Project[] = [
       },
       {
         type: "quote",
-        text: "Kaido kept saying 'less red, more red.' I thought he was joking. He wasn't. The whole campaign is the answer to that riddle.",
+        text: "Debargha kept saying 'less red, more red.' I thought he was joking. He wasn't. The whole campaign is the answer to that riddle.",
         caption: "— Adèle Mercier, Stylist",
       },
       {
@@ -191,7 +191,7 @@ export const PROJECTS: Project[] = [
     solution:
       "We built on Shopify with a custom theme that deliberately breaks most of Shopify's conventions. Average session duration on the site is 4 minutes 18 seconds. Conversion rate is a quiet 2.8%. The studio has since opened a second kiln and hired two apprentices.",
     credits: [
-      { role: "Creative Direction", name: "Kaido Voss" },
+      { role: "Creative Direction", name: "Debargha Moriatry" },
       { role: "Design", name: "Noa Ferreira" },
       { role: "Photography", name: "Yuki Tanaka" },
       { role: "Development", name: "Jonas Weber" },
@@ -260,7 +260,7 @@ export const PROJECTS: Project[] = [
     solution:
       "The site launched with a single long essay by the founding partner, six buildings, and no contact form. Enquiries went up 340% in the first quarter. The site won Awwwards SOTD and was longlisted for the European Design Awards.",
     credits: [
-      { role: "Digital Direction", name: "Kaido Voss" },
+      { role: "Digital Direction", name: "Debargha Moriatry" },
       { role: "Creative Code", name: "Jonas Weber, Mira Adler" },
       { role: "3D Modelling", name: "Formhaus internal" },
       { role: "Writing", name: "Dr. Klaus Formhaus" },
@@ -329,7 +329,7 @@ export const PROJECTS: Project[] = [
     solution:
       "The library opened in March 2024. In the first six months, 840,000 visitors used the building. The wayfinding system was cited in the post-occupancy evaluation as the single highest-rated element of the building.",
     credits: [
-      { role: "Creative Direction", name: "Kaido Voss" },
+      { role: "Creative Direction", name: "Debargha Moriatry" },
       { role: "Type Design", name: "Eli Cohen" },
       { role: "Fabrication", name: "Werkstatt Berlin" },
       { role: "Architecture", name: "Rieger architects" },
@@ -383,7 +383,7 @@ export const PROJECTS: Project[] = [
       "The magazine is sold in 14 countries and has a subscriber base of 8,400 — small by newsstand standards, large by art magazine standards. It was nominated for a Stack Award for Best Design in 2024.",
     credits: [
       { role: "Editorial Direction", name: "Maya Okafor" },
-      { role: "Art Direction", name: "Kaido Voss" },
+      { role: "Art Direction", name: "Debargha Moriatry" },
       { role: "Production", name: "Drukkerij Rosbeek" },
     ],
     blocks: [

@@ -133,10 +133,10 @@ export default function Contact() {
 
           <SidebarBlock label="Write" content={
             <div>
-              <a href="mailto:studio@kaidovoss.com" className="block font-display text-2xl link-line"><Scramble>studio@kaidovoss.com</Scramble></a>
+              <a href="mailto:studio@debarghamoriatry.com" className="block font-display text-2xl link-line"><Scramble>studio@debarghamoriatry.com</Scramble></a>
               <div className="mt-3 text-sm text-[var(--bone)]/60 space-y-1">
-                <div>Press — <a className="link-line" href="mailto:press@kaidovoss.com">press@kaidovoss.com</a></div>
-                <div>Careers — <a className="link-line" href="mailto:work@kaidovoss.com">work@kaidovoss.com</a></div>
+                <div>Press — <a className="link-line" href="mailto:press@debarghamoriatry.com">press@debarghamoriatry.com</a></div>
+                <div>Careers — <a className="link-line" href="mailto:work@debarghamoriatry.com">work@debarghamoriatry.com</a></div>
               </div>
             </div>
           } />

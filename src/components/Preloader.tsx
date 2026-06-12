@@ -106,7 +106,7 @@ export default function Preloader({
 
       <div className="absolute inset-x-8 bottom-[30vh] overflow-hidden">
         <div ref={line1} className="font-display text-[14vw] leading-[0.9] tracking-tight">
-          Kaido
+          Debargha
         </div>
       </div>
       <div className="absolute inset-x-8 bottom-[14vh] overflow-hidden">

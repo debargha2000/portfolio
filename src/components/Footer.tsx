@@ -70,7 +70,7 @@ export default function Footer() {
 
       <div className="mt-16 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
         <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--bone)]/50">
-          © 2021—2026 Kaido Voss Studio · All rights, most wrongs
+          © 2021—2026 Debargha Moriatry Studio · All rights, most wrongs
         </div>
         <div className="flex items-center gap-6 font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--bone)]/50">
           <span>BER {time}</span>
@@ -80,7 +80,7 @@ export default function Footer() {
       </div>
 
       <div className="mt-8 text-[18vw] font-editorial italic leading-none text-[var(--bone)]/5 select-none pointer-events-none -mb-[5vw]">
-        Kaido Voss
+        Debargha Moriatry
       </div>
     </footer>
   );

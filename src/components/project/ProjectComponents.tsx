@@ -35,7 +35,7 @@ export const HeroImage = React.memo(function HeroImage({ src, title }: { src: st
   const parallax = useParallax<HTMLDivElement>(0.25);
   const clip = useClipReveal<HTMLDivElement>("h");
   return (
-    <div ref={(n) => { (parallax as any).current = n; (clip as any).current = n; }} className="relative aspect-[21/9] w-full overflow-hidden">
+    <div ref={(n) => { (parallax as any).current = n; (clip as any).current = n; }} className="hero-section relative aspect-[21/9] w-full overflow-hidden">
       <img src={src} alt={title} className="w-full h-full object-cover" />
       <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg)]/60 to-transparent" />
     </div>

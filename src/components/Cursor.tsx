@@ -41,6 +41,15 @@ export default function Cursor() {
       const interactive = t.closest("a, button, [data-cursor='hover']");
       if (interactive) ring.current?.classList.add("hover");
       else ring.current?.classList.remove("hover");
+
+      const inHero = t.closest(".hero-section");
+      if (inHero) {
+        dot.current?.classList.add("in-hero");
+        ring.current?.classList.add("in-hero");
+      } else {
+        dot.current?.classList.remove("in-hero");
+        ring.current?.classList.remove("in-hero");
+      }
     };
 
     window.addEventListener("mousemove", onMove);

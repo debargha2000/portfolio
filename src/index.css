@@ -132,19 +132,29 @@ html.lenis body {
 .cursor-dot {
   width: 6px;
   height: 6px;
-  background: #f4f1ea;
+  background: var(--orange);
+  transition: background 0.3s ease;
+}
+.cursor-dot.in-hero {
+  background: var(--acid);
 }
 .cursor-ring {
   width: 36px;
   height: 36px;
-  border: 1px solid #f4f1ea;
-  transition: width 0.25s ease, height 0.25s ease, background 0.25s ease;
+  border: 1px solid var(--orange);
+  transition: width 0.25s ease, height 0.25s ease, background 0.25s ease, border-color 0.3s ease;
+}
+.cursor-ring.in-hero {
+  border-color: var(--acid);
 }
 .cursor-ring.hover {
   width: 72px;
   height: 72px;
-  background: #f4f1ea;
+  background: var(--orange);
   mix-blend-mode: difference;
+}
+.cursor-ring.hover.in-hero {
+  background: var(--acid);
 }
 
 /* Selection */
@@ -680,4 +690,12 @@ details.faq[open] .faq-plus { transform: rotate(135deg); }
   background: var(--fg);
   color: var(--bg);
   border-color: var(--fg);
+}
+
+/* Hero text stroke morph */
+.hero-morph-text {
+  -webkit-text-stroke: 1px rgba(0, 0, 0, 0.4);
+}
+.no-stroke {
+  -webkit-text-stroke: 0;
 }

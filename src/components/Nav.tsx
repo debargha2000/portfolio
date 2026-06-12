@@ -35,8 +35,8 @@ export default function Nav() {
     <nav className={`fixed top-0 left-0 right-0 z-50 px-6 md:px-10 py-6 flex items-center justify-between mix-blend-difference transition-all duration-300 ${scrolled ? "backdrop-blur-[5px]" : ""}`}>
       <Link to="/" className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.22em] font-medium">
         <span className="inline-block w-2 h-2 rounded-full bg-[var(--orange)] spin-slow" />
-        <Scramble>KAIDO</Scramble>
-        <span className="font-editorial italic text-base lowercase ml-0.5 normal-case tracking-normal">Voss</span>
+        <Scramble>DEBARGHA</Scramble>
+        <span className="font-editorial italic text-base lowercase ml-0.5 normal-case tracking-normal">Moriatry</span>
       </Link>
 
       <ul className="hidden md:flex items-center gap-8 font-mono text-[10px] uppercase tracking-[0.25em] font-medium">
@@ -65,7 +65,7 @@ export default function Nav() {
       <div className="absolute top-0 left-0 right-0 px-6 py-6 flex justify-between items-center border-b border-[var(--bone)]/10">
         <Link to="/" className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.22em] font-medium text-white">
           <span className="inline-block w-2 h-2 rounded-full bg-[var(--orange)]" />
-          KAIDO
+          DEBARGHA
         </Link>
         <button onClick={() => setMenuOpen(false)} className="chip !px-4 !border-white/20 !text-white"><span className="label">Close</span></button>
       </div>
