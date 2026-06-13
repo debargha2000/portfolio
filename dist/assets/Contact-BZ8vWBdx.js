@@ -1,4 +1,4 @@
-import{j as e}from"./three-DubSO05U.js";import{b as d}from"./vendor-qsdxRy4C.js";import{g as f}from"./animations-CW5XuxEQ.js";import{C as o,W as v,M as C,S as p,e as y,i as S}from"./index-B8bIF_ls.js";f.registerPlugin(S);function R(){const[a,s]=d.useState({name:"",email:"",company:"",budget:"",timeline:"",message:""}),[r,n]=d.useState(!1),i=t=>{t.preventDefault(),n(!0);const l=["#c6ff3d","#ff4d1f","#f4f1ea","#a4e022"];for(let h=0;h<60;h++){const c=document.createElement("div");c.style.cssText=`
+import{j as e}from"./three-DubSO05U.js";import{b as d}from"./vendor-qsdxRy4C.js";import{g as f}from"./animations-CW5XuxEQ.js";import{C as o,W as v,M as C,S as p,e as y,i as S}from"./index-oCueazN-.js";f.registerPlugin(S);function R(){const[a,s]=d.useState({name:"",email:"",company:"",budget:"",timeline:"",message:""}),[r,n]=d.useState(!1),i=t=>{t.preventDefault(),n(!0);const l=["#c6ff3d","#ff4d1f","#f4f1ea","#a4e022"];for(let h=0;h<60;h++){const c=document.createElement("div");c.style.cssText=`
         position: fixed;
         width: ${Math.random()*10+4}px;
         height: ${Math.random()*10+4}px;
