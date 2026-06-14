@@ -3,14 +3,11 @@ import { Link } from "react-router-dom";
 import gsap from "gsap";
 import { WordReveal, Magnetic } from "../../features/motion/Motion";
 import { useScrollSkew } from "../../features/motion/motionUtils";
-import { usePreloaderContext } from "../../app/providers/PreloaderProvider";
+import { InkCanvas } from "./InkCanvas";
 
 export default function Hero() {
   const root = useRef<HTMLElement>(null);
   const skew = useScrollSkew<HTMLDivElement>(4);
-
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const { heroVideoBlobUrl } = usePreloaderContext();
 
   // Cursor spotlight
   useEffect(() => {
@@ -48,37 +45,6 @@ export default function Hero() {
     };
   }, []);
 
-  // Playback loop based on visibility
-  useEffect(() => {
-    const section = root.current;
-    if (!section) return;
-
-    let isVisible = false;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          isVisible = entry.isIntersecting;
-          if (isVisible) {
-            if (videoRef.current) {
-              videoRef.current.play().catch(() => {});
-            }
-          } else {
-            if (videoRef.current) {
-              videoRef.current.pause();
-            }
-          }
-        });
-      },
-      { threshold: 0 }
-    );
-
-    observer.observe(section);
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
-
   // One-time reveal of the headline lines
   useEffect(() => {
     const tl = gsap.timeline({ delay: 0.2 });
@@ -88,22 +54,10 @@ export default function Hero() {
       .fromTo(".h-meta", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8 }, "-=0.6");
   }, []);
 
-  const videoSrc = heroVideoBlobUrl || "/videos/hero-bg.mp4";
-
   return (
     <section ref={root} className="hero-section relative min-h-[100svh] w-full flex flex-col justify-between px-6 md:px-10 pt-32 pb-10 md:pb-12 overflow-hidden">
       <div className="absolute inset-0 z-0 overflow-hidden bg-black">
-        <video
-          ref={videoRef}
-          src={videoSrc}
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-          className="w-full h-full object-cover"
-          poster="/images/hero-ink.jpg"
-        />
+        <InkCanvas />
       </div>
       <div className="hero-spotlight absolute inset-0 z-[1] pointer-events-none" />
       <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg)]/30 via-transparent to-[var(--bg)]/30 z-[2]" />
