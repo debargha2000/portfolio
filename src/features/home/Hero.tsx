@@ -49,21 +49,21 @@ export default function Hero() {
       </div>
 
       {/* HEADLINE — Fraunces display + Instrument Serif italic mix */}
-      <div ref={skew} className="relative z-10 mix-blend-difference mt-auto">
+      <div ref={skew} className="relative z-10 mt-auto">
         <div className="text-white hero-morph-text">
           <div className="overflow-hidden">
             <div className="h-l1 font-display display-thin text-[18vw] sm:text-[16vw] md:text-[13vw] lg:text-[11vw] leading-[0.9] tracking-[-0.04em] ml-[2%] sm:ml-[4%] lg:ml-[6%]">
-              Designing<span className="font-editorial text-[var(--acid)] no-stroke"> the</span>
+              Designing<span className="font-editorial text-[var(--acid)] black-stroke"> the</span>
             </div>
           </div>
           <div className="overflow-hidden">
             <div className="h-l2 font-display display-light text-[18vw] sm:text-[16vw] md:text-[13vw] lg:text-[11vw] leading-[0.9] tracking-[-0.04em] ml-[8%] sm:ml-[15%] lg:ml-[22%]">
-              <span className="font-editorial text-[#ff5f00] no-stroke">quiet </span>spaces
+              <span className="font-editorial text-[#ff5f00] white-stroke">quiet </span>spaces
             </div>
           </div>
           <div className="overflow-hidden">
             <div className="h-l3 font-editorial italic text-[16.5vw] sm:text-[14.5vw] md:text-[11.5vw] lg:text-[9.5vw] leading-[0.95] tracking-[-0.02em] ml-[12%] sm:ml-[25%] lg:ml-[40%]">
-              between <span className="text-[#ff5f00] no-stroke">noise</span><span className="text-[var(--acid)] no-stroke">.</span>
+              between <span className="text-[#ff5f00] white-stroke">noise</span><span className="text-[var(--acid)] white-stroke">.</span>
             </div>
           </div>
         </div>
