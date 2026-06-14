@@ -46,7 +46,7 @@ export function InkCanvas() {
     <div className="h-full w-full">
       <Canvas
         camera={{ position: [0, 0, 1] }}
-        dpr={window.devicePixelRatio}
+        dpr={[1, 1.5]}
         gl={{ antialias: false }} // Turn off antialias for performance on full screen shader
       >
         <ShaderPlane />

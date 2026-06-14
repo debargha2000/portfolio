@@ -120,12 +120,10 @@ export function Counter({
   decimals?: number;
   className?: string;
 }) {
-  const { ref, val } = useCountUp(to, duration, decimals);
+  const { ref } = useCountUp(to, duration, decimals, 0, prefix, suffix);
   return (
-    <span ref={ref} className={className}>
-      {prefix}
-      {val.toLocaleString()}
-      {suffix}
+    <span ref={ref as any} className={className}>
+      {prefix}0{suffix}
     </span>
   );
 }

@@ -27,7 +27,7 @@ const FONT_SPECS: FontLoadSpec[] = [
   { family: 'JetBrains Mono', weight: '500', style: 'normal' },
 ];
 
-export function buildFontFace(family: string, weight: string | number, style: 'normal' | 'italic'): string {
+function buildFontFace(family: string, weight: string | number, style: 'normal' | 'italic'): string {
   return `${style} ${weight} ${family}`;
 }
 
@@ -49,16 +49,6 @@ export async function loadFonts(specs: FontLoadSpec[] = FONT_SPECS): Promise<voi
   await document.fonts.ready;
 }
 
-export async function loadCriticalFonts(): Promise<void> {
-  const criticalSpecs: FontLoadSpec[] = [
-    { family: 'Fraunces', weight: '300', style: 'normal' },
-    { family: 'Fraunces', weight: '400', style: 'italic' },
-    { family: 'Instrument Serif', weight: '400', style: 'italic' },
-    { family: 'Inter Tight', weight: '300', style: 'normal' },
-    { family: 'JetBrains Mono', weight: '500', style: 'normal' },
-  ];
-  
-  await loadFonts(criticalSpecs);
-}
+
 
 export { FONT_SPECS };

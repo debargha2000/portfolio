@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Magnetic, Scramble } from "../../features/motion/Motion";
 import { useClipReveal } from "../../features/motion/motionUtils";
 
-export const ProcessTile = React.memo(function ProcessTile({ s, i }: { s: { n: string; t: string }; i: number }) {
+const ProcessTile = React.memo(function ProcessTile({ s, i }: { s: { n: string; t: string }; i: number }) {
   const clip = useClipReveal<HTMLDivElement>("circle", i * 0.15);
   return (
     <div

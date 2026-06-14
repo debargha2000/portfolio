@@ -4,18 +4,14 @@ import { PROJECTS } from "../../features/work/projects";
 import { lazy, Suspense } from "react";
 const ProjectImage = lazy(() => import("../../features/work/ProjectImage"));
 import { Magnetic, Scramble } from "../../features/motion/Motion";
-import { useTilt, useClipReveal, useReveal } from "../../features/motion/motionUtils";
+import { useTilt, useReveal } from "../../features/motion/motionUtils";
 
-export const FeaturedCard = React.memo(function FeaturedCard({ p, i }: { p: typeof PROJECTS[number]; i: number }) {
+const FeaturedCard = React.memo(function FeaturedCard({ p, i }: { p: typeof PROJECTS[number]; i: number }) {
   const tilt = useTilt<HTMLAnchorElement>(8);
-  const clip = useClipReveal<HTMLAnchorElement>(i === 0 ? "circle" : i === 1 ? "h" : "v");
 
   return (
     <Link
-      ref={(n) => {
-        (tilt as any).current = n;
-        (clip as any).current = n;
-      }}
+      ref={tilt as any}
       to={`/work/${p.slug}`}
       className={`tilt-card group relative overflow-hidden block ${
         i === 0 ? "md:col-span-12 lg:col-span-7 aspect-[4/3]" : i === 1 ? "md:col-span-12 lg:col-span-5 aspect-[4/3]" : "md:col-span-12 aspect-[21/9]"
@@ -24,7 +20,7 @@ export const FeaturedCard = React.memo(function FeaturedCard({ p, i }: { p: type
     >
       <div className="absolute inset-0 project-img">
         <Suspense fallback={<div className="w-full h-full bg-[var(--mute)]" />}>
-          <ProjectImage src={p.thumbnail} active={false} />
+          <ProjectImage src={p.thumbnail} active={true} />
         </Suspense>
       </div>
       <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />

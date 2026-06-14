@@ -2,7 +2,7 @@ import React from "react";
 import { Scramble } from "../../features/motion/Motion";
 import { useTilt, useReveal, useMagnetic } from "../../features/motion/motionUtils";
 
-export const ServiceCard = React.memo(function ServiceCard({ c }: { c: { n: string; t: string; d: string; icon: string }; i: number }) {
+const ServiceCard = React.memo(function ServiceCard({ c }: { c: { n: string; t: string; d: string; icon: string }; i: number }) {
   const tilt = useTilt<HTMLDivElement>(6);
   const reveal = useReveal<HTMLDivElement>();
   const magIcon = useMagnetic<HTMLDivElement>(0.6);

@@ -4,7 +4,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Magnetic } from "../../features/motion/Motion";
 import { useCircleReveal } from "../../features/motion/motionUtils";
 
-export const PressQuote = React.memo(function PressQuote({ q, i }: { q: { q: string; a: string; y: string }; i: number }) {
+const PressQuote = React.memo(function PressQuote({ q, i }: { q: { q: string; a: string; y: string }; i: number }) {
   const ref = useRef<HTMLDivElement>(null);
   const circle = useCircleReveal<HTMLDivElement>(i * 0.1);
   useEffect(() => {

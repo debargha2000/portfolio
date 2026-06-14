@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { usePreloader } from "../../features/preloader/usePreloader";
 import Preloader from "../../features/preloader/Preloader";
-import { PreloaderProvider } from "../providers/PreloaderProvider";
+
 import { CursorProvider } from "../providers/CursorProvider";
 import { LenisProvider } from "../providers/LenisProvider";
 import { ScrollProvider } from "../providers/ScrollProvider";
@@ -12,7 +12,7 @@ export function AppShell() {
     progress,
     isComplete,
     start,
-    heroVideoResult,
+
     failedTasks,
     retryFailed,
     tasks,
@@ -54,9 +54,7 @@ export function AppShell() {
             />
           )}
           {showApp && (
-            <PreloaderProvider heroVideoResult={heroVideoResult}>
-              <Layout />
-            </PreloaderProvider>
+            <Layout />
           )}
         </ScrollProvider>
       </CursorProvider>

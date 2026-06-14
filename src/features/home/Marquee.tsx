@@ -1,17 +1,44 @@
 import { useEffect, useRef } from "react";
-import { useScrollVelocity } from "../../features/motion/motionUtils";
 
 export default function Marquee() {
-  const trackRef = useRef<HTMLDivElement>(null);
-  const vel = useScrollVelocity();
+  const track1Ref = useRef<HTMLDivElement>(null);
+  const track2Ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!trackRef.current) return;
-    // Clamp velocity so extreme scrolling doesn't break the transform.
-    const clamped = Math.max(-60, Math.min(60, vel * 3));
-    // Apply velocity as an additional translateX offset that decays naturally via the hook.
-    trackRef.current.style.setProperty("--vel", `${clamped}px`);
-  }, [vel]);
+    if (!track1Ref.current || !track2Ref.current) return;
+    let lastScroll = window.scrollY;
+    let lastTime = performance.now();
+    let currentVel = 0;
+    let raf = 0;
+
+    const loop = () => {
+      const now = performance.now();
+      const dt = Math.max(now - lastTime, 1);
+      const targetVel = ((window.scrollY - lastScroll) / dt) * 16;
+      currentVel += (targetVel - currentVel) * 0.2;
+      
+      lastScroll = window.scrollY;
+      lastTime = now;
+
+      // Apply transformations directly to bypass React renders
+      const skew = Math.max(-8, Math.min(8, currentVel * 0.6));
+      const clampedVel = Math.max(-60, Math.min(60, currentVel * 3));
+      
+      if (track1Ref.current) {
+        track1Ref.current.style.transform = `skewY(${skew}deg)`;
+      }
+      
+      if (track2Ref.current) {
+        track2Ref.current.style.transform = `skewY(${-skew}deg)`;
+        track2Ref.current.style.setProperty("--vel", `${clampedVel}px`);
+      }
+
+      raf = requestAnimationFrame(loop);
+    };
+    
+    loop();
+    return () => cancelAnimationFrame(raf);
+  }, []);
 
   const rowA = [
     "Brand Identity", "Art Direction", "Interactive 3D", "Editorial Design",
@@ -22,14 +49,11 @@ export default function Marquee() {
     "CSSDA Best UI", "It's Nice That", "Site Inspire", "Godly",
   ];
 
-  // Animate base scroll via CSS, but skew the track based on scroll velocity
-  const skew = Math.max(-8, Math.min(8, vel * 0.6));
-
   return (
     <section className="relative py-8 md:py-12 border-y border-[var(--bone)]/10 overflow-hidden">
       <div
-        className="marquee-track"
-        style={{ transform: `skewY(${skew}deg)` }}
+        ref={track1Ref}
+        className="marquee-track will-change-transform"
       >
         {[...rowA, ...rowA].map((item, i) => (
           <span
@@ -42,12 +66,11 @@ export default function Marquee() {
         ))}
       </div>
       <div
-        ref={trackRef}
-        className="marquee-track mt-4"
+        ref={track2Ref}
+        className="marquee-track mt-4 will-change-transform"
         style={{
           animationDirection: "reverse",
           animationDuration: "55s",
-          transform: `skewY(${-skew}deg)`,
         }}
       >
         {[...rowB, ...rowB].map((item, i) => (

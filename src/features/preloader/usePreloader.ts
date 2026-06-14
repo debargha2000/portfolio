@@ -1,5 +1,4 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { prebufferVideo, VideoPrebufferResult, revokeBlobUrl } from '../../utils/videoPrebuffer';
 import { loadFonts, FONT_SPECS } from '../../utils/fontLoader';
 import { loadImage } from '../../utils/imageLoader';
 import { PROJECTS } from '../work/projects';
@@ -20,7 +19,6 @@ export interface PreloaderState {
   failedTasks: string[];
   isComplete: boolean;
   isRunning: boolean;
-  heroVideoResult: VideoPrebufferResult | null;
   taskProgress: Record<string, { loaded: number; total: number; percentage: number }>;
 }
 
@@ -35,23 +33,7 @@ const TASKS: PreloadTask[] = [
       if (onProgress) onProgress(100, 100);
     }
   },
-  {
-    id: 'hero-video-full',
-    name: 'Hero Media',
-    weight: 40,
-    critical: true,
-    load: async (onProgress, signal) => {
-      // Load poster silently without blocking
-      loadImage('/images/hero-ink.jpg').catch(() => {});
-      const result = await prebufferVideo('/videos/hero-bg.mp4', {
-        onProgress: (loaded, total) => {
-          if (onProgress) onProgress(loaded, total);
-        },
-        signal
-      });
-      return result;
-    }
-  },
+
   {
     id: 'routes',
     name: 'Application Routes',
@@ -148,7 +130,6 @@ export function usePreloader() {
     failedTasks: [],
     isComplete: false,
     isRunning: false,
-    heroVideoResult: null,
     taskProgress: TASKS.reduce((acc, t) => {
       acc[t.id] = { loaded: 0, total: 100, percentage: 0 };
       return acc;
@@ -202,19 +183,12 @@ export function usePreloader() {
     
     const runTask = async (task: PreloadTask) => {
       try {
-        const result = await task.load(
+        await task.load(
           (loaded, total) => updateTaskProgress(task.id, loaded, total),
           signal
         );
         
         setState(prev => {
-          if (task.id === 'hero-video-full' && result) {
-            return {
-              ...prev,
-              heroVideoResult: result as VideoPrebufferResult,
-              completedTasks: [...prev.completedTasks, task.id]
-            };
-          }
           return {
             ...prev,
             completedTasks: [...prev.completedTasks, task.id]
@@ -286,12 +260,9 @@ export function usePreloader() {
   
   useEffect(() => {
     return () => {
-      if (state.heroVideoResult?.blobUrl) {
-        revokeBlobUrl(state.heroVideoResult.blobUrl);
-      }
       abortControllerRef.current?.abort();
     };
-  }, [state.heroVideoResult]);
+  }, []);
   
   return {
     ...state,

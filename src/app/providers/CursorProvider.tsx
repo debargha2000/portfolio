@@ -6,16 +6,12 @@ export function CursorProvider({ children }: { children: React.ReactNode }) {
   const isTouchDevice = useMediaQuery('(hover: none) and (pointer: coarse)');
   const shouldDisable = prefersReducedMotion || isTouchDevice;
 
+  const glow = useRef<HTMLDivElement>(null);
   const dot = useRef<HTMLDivElement>(null);
   const ring = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (shouldDisable) return;
-
-    // Glow Logic
-    const glow = document.createElement("div");
-    glow.className = "cursor-glow hidden md:block";
-    document.body.appendChild(glow);
 
     const mx = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
     const rx = { x: mx.x, y: mx.y };
@@ -33,9 +29,6 @@ export function CursorProvider({ children }: { children: React.ReactNode }) {
       gx = e.clientX;
       gy = e.clientY;
 
-      if (dot.current) {
-        dot.current.style.transform = `translate(${mx.x}px, ${mx.y}px) translate(-50%, -50%)`;
-      }
       if (!running) {
         running = true;
         raf = requestAnimationFrame(loop);
@@ -48,10 +41,15 @@ export function CursorProvider({ children }: { children: React.ReactNode }) {
       cx += (gx - cx) * 0.15;
       cy += (gy - cy) * 0.15;
 
-      if (ring.current) {
-        ring.current.style.transform = `translate(${rx.x}px, ${rx.y}px) translate(-50%, -50%)`;
+      if (dot.current) {
+        dot.current.style.transform = `translate3d(${mx.x}px, ${mx.y}px, 0) translate(-50%, -50%)`;
       }
-      glow.style.transform = `translate3d(${cx}px, ${cy}px, 0) translate(-50%, -50%)`;
+      if (ring.current) {
+        ring.current.style.transform = `translate3d(${rx.x}px, ${rx.y}px, 0) translate(-50%, -50%)`;
+      }
+      if (glow.current) {
+        glow.current.style.transform = `translate3d(${cx}px, ${cy}px, 0) translate(-50%, -50%)`;
+      }
 
       if (Math.abs(mx.x - rx.x) < 0.1 && Math.abs(mx.y - rx.y) < 0.1 && Math.abs(gx - cx) < 0.1 && Math.abs(gy - cy) < 0.1) {
         running = false;
@@ -77,13 +75,12 @@ export function CursorProvider({ children }: { children: React.ReactNode }) {
       }
     };
 
-    window.addEventListener("mousemove", onMove);
-    window.addEventListener("mouseover", onOver);
+    window.addEventListener("mousemove", onMove, { passive: true });
+    window.addEventListener("mouseover", onOver, { passive: true });
     return () => {
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("mouseover", onOver);
       cancelAnimationFrame(raf);
-      glow.remove();
     };
   }, [shouldDisable]);
 
@@ -91,8 +88,9 @@ export function CursorProvider({ children }: { children: React.ReactNode }) {
     <>
       {!shouldDisable && (
         <>
-          <div ref={dot} className="cursor-dot hidden md:block" />
-          <div ref={ring} className="cursor-ring hidden md:block" />
+          <div ref={glow} className="cursor-glow hidden md:block" style={{ willChange: "transform", pointerEvents: "none" }} />
+          <div ref={dot} className="cursor-dot hidden md:block" style={{ willChange: "transform", pointerEvents: "none" }} />
+          <div ref={ring} className="cursor-ring hidden md:block" style={{ willChange: "transform", pointerEvents: "none" }} />
         </>
       )}
       {children}

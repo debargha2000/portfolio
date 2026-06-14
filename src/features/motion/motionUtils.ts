@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useLayoutEffect, useRef, useCallback } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -6,73 +6,12 @@ gsap.registerPlugin(ScrollTrigger);
 
 
 
-/* ---------- Text highlight on scroll ---------- */
-export function useTextHighlight<T extends HTMLElement>() {
-  const ref = useRef<T>(null);
-  useEffect(() => {
-    if (!ref.current) return;
-    const el = ref.current;
-    const text = el.textContent || "";
-    el.innerHTML = "";
-    const words = text.split(" ").map((w, i) => {
-      const span = document.createElement("span");
-      span.className = "highlight-word";
-      span.textContent = w + (i < text.split(" ").length - 1 ? " " : "");
-      el.appendChild(span);
-      return span;
-    });
-    const st = ScrollTrigger.create({
-      trigger: el,
-      start: "top 70%",
-      end: "bottom 30%",
-      scrub: true,
-      onUpdate: (self) => {
-        const count = Math.floor(self.progress * words.length);
-        words.forEach((w, i) => {
-          w.style.opacity = i < count ? "1" : "0.3";
-          w.style.color = i < count ? "var(--acid)" : "";
-        });
-      },
-    });
-    return () => st.kill();
-  }, []);
-  return ref;
-}
 
-/* ---------- Wave text ---------- */
-export function useWaveText<T extends HTMLElement>(amplitude = 20, speed = 2) {
-  const ref = useRef<T>(null);
-  useEffect(() => {
-    if (!ref.current) return;
-    const el = ref.current;
-    const text = el.textContent || "";
-    el.innerHTML = "";
-    const chars = text.split("").map((ch) => {
-      const span = document.createElement("span");
-      span.className = "wave-char";
-      span.textContent = ch === " " ? "\u00A0" : ch;
-      el.appendChild(span);
-      return span;
-    });
-    let frame = 0;
-    let raf = 0;
-    const loop = () => {
-      chars.forEach((c, i) => {
-        const y = Math.sin((frame + i * 0.3) * 0.05 * speed) * amplitude;
-        c.style.transform = `translateY(${y}px)`;
-      });
-      frame++;
-      raf = requestAnimationFrame(loop);
-    };
-    loop();
-    return () => cancelAnimationFrame(raf);
-  }, [amplitude, speed]);
-  return ref;
-}
+
+
 
 /* ---------- Number flip ---------- */
 export function useNumberFlip(target: number, duration = 1.5) {
-  const [display, setDisplay] = useState("0");
   const ref = useRef<HTMLSpanElement>(null);
   useEffect(() => {
     if (!ref.current) return;
@@ -82,22 +21,23 @@ export function useNumberFlip(target: number, duration = 1.5) {
       onEnter: () => {
         const startTime = Date.now();
         const animate = () => {
+          if (!ref.current) return;
           const elapsed = (Date.now() - startTime) / 1000;
           const progress = Math.min(elapsed / duration, 1);
           const eased = 1 - Math.pow(1 - progress, 3);
           const current = Math.floor(eased * target);
-          setDisplay(String(current).padStart(String(target).length, "0"));
+          ref.current.textContent = String(current).padStart(String(target).length, "0");
           if (progress < 1) requestAnimationFrame(animate);
         };
         animate();
       },
       onLeaveBack: () => {
-        setDisplay("0");
+        if (ref.current) ref.current.textContent = "0";
       }
     });
     return () => st.kill();
   }, [target, duration]);
-  return { ref, display };
+  return { ref };
 }
 
 /* ---------- Circle mask reveal ---------- */
@@ -126,63 +66,7 @@ export function useCircleReveal<T extends HTMLElement>(delay = 0) {
   return ref;
 }
 
-/* ---------- Particle trail ---------- */
-export function useParticleTrail() {
-  useEffect(() => {
-    const canvas = document.createElement("canvas");
-    canvas.style.cssText = "position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:9998;mix-blend-mode:screen;";
-    document.body.appendChild(canvas);
-    const ctx = canvas.getContext("2d")!;
-    const particles: { x: number; y: number; vx: number; vy: number; life: number; size: number }[] = [];
-    let mx = 0, my = 0;
-    const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
-    resize();
-    window.addEventListener("resize", resize);
-    const onMove = (e: MouseEvent) => { mx = e.clientX; my = e.clientY; };
-    window.addEventListener("mousemove", onMove);
-    let raf = 0;
-    const loop = () => {
-      ctx.fillStyle = "rgba(0,0,0,0.1)";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      for (let i = 0; i < 2; i++) {
-        particles.push({
-          x: mx + (Math.random() - 0.5) * 20,
-          y: my + (Math.random() - 0.5) * 20,
-          vx: (Math.random() - 0.5) * 2,
-          vy: (Math.random() - 0.5) * 2 - 1,
-          life: 1,
-          size: Math.random() * 3 + 1,
-        });
-      }
-      for (let i = particles.length - 1; i >= 0; i--) {
-        const p = particles[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        p.vy += 0.05;
-        p.life -= 0.02;
-        if (p.life <= 0) {
-          particles.splice(i, 1);
-          continue;
-        }
-        ctx.fillStyle = `rgba(198,255,61,${p.life})`;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      raf = requestAnimationFrame(loop);
-    };
-    loop();
-    return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener("resize", resize);
-      window.removeEventListener("mousemove", onMove);
-      canvas.remove();
-    };
-  }, []);
-}
+
 
 /* ---------- Magnetic ---------- */
 // Pulls an element toward the cursor within a radius.
@@ -276,8 +160,7 @@ export function useTilt<T extends HTMLElement>(max = 12) {
 }
 
 /* ---------- Count up ---------- */
-export function useCountUp(target: number, duration = 1.6, decimals = 0, start = 0) {
-  const [val, setVal] = useState(start);
+export function useCountUp(target: number, duration = 1.6, decimals = 0, start = 0, prefix = "", suffix = "") {
   const ref = useRef<HTMLSpanElement>(null);
   useEffect(() => {
     if (!ref.current) return;
@@ -290,18 +173,24 @@ export function useCountUp(target: number, duration = 1.6, decimals = 0, start =
           v: target,
           duration,
           ease: "power2.out",
-          onUpdate: () => setVal(Number(obj.v.toFixed(decimals))),
+          onUpdate: () => {
+            if (ref.current) {
+              ref.current.textContent = prefix + Number(obj.v.toFixed(decimals)).toLocaleString() + suffix;
+            }
+          },
         });
       },
       onLeaveBack: () => {
         gsap.killTweensOf(obj);
         obj.v = start;
-        setVal(start);
+        if (ref.current) {
+          ref.current.textContent = prefix + Number(start.toFixed(decimals)).toLocaleString() + suffix;
+        }
       }
     });
     return () => st.kill();
-  }, [target, duration, decimals, start]);
-  return { ref, val };
+  }, [target, duration, decimals, start, prefix, suffix]);
+  return { ref };
 }
 
 /* ---------- Text scramble on hover ---------- */
@@ -359,29 +248,7 @@ export function useScramble() {
   return { scramble, reset };
 }
 
-/* ---------- Scroll velocity ---------- */
-export function useScrollVelocity() {
-  const [vel, setVel] = useState(0);
-  useEffect(() => {
-    let last = window.scrollY;
-    let lastTime = performance.now();
-    let raf = 0;
-    let current = 0;
-    const loop = () => {
-      const now = performance.now();
-      const dt = Math.max(now - lastTime, 1);
-      const target = ((window.scrollY - last) / dt) * 16; // px per frame
-      current += (target - current) * 0.2;
-      last = window.scrollY;
-      lastTime = now;
-      setVel(current);
-      raf = requestAnimationFrame(loop);
-    };
-    loop();
-    return () => cancelAnimationFrame(raf);
-  }, []);
-  return vel;
-}
+
 
 /* ---------- Reveal on scroll (fade + y) ---------- */
 export function useReveal<T extends HTMLElement>(delay = 0) {

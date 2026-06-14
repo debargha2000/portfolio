@@ -63,29 +63,3 @@ export function loadImage(
     img.src = src;
   });
 }
-
-export function loadImages(
-  sources: string[],
-  options: ImageLoadOptions = {}
-): Promise<HTMLImageElement[]> {
-  const { onProgress } = options;
-  let completed = 0;
-  
-  const promises = sources.map(src => 
-    loadImage(src, {
-      ...options,
-      onProgress: onProgress ? (loaded, _total) => {
-        onProgress(completed * 100 + loaded, sources.length * 100);
-      } : undefined
-    }).then(img => {
-      completed++;
-      return img;
-    })
-  );
-  
-  return Promise.all(promises);
-}
-
-export function preloadImage(src: string): Promise<void> {
-  return loadImage(src).then(() => {});
-}

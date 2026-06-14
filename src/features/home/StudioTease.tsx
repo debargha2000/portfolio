@@ -4,12 +4,12 @@ import gsap from "gsap";
 import { Magnetic } from "../../features/motion/Motion";
 import { useNumberFlip } from "../../features/motion/motionUtils";
 
-export function FlipCounter({ to, label }: { to: number; label: string }) {
-  const { ref, display } = useNumberFlip(to, 1.6);
+function FlipCounter({ to, label }: { to: number; label: string }) {
+  const { ref } = useNumberFlip(to, 1.6);
   return (
     <div>
-      <div ref={ref as any} className="font-display display-thin text-7xl md:text-8xl text-[var(--acid)] tracking-[-0.04em]">
-        <span className="number-flip">{display}</span>
+      <div className="font-display display-thin text-7xl md:text-8xl text-[var(--acid)] tracking-[-0.04em]">
+        <span ref={ref as any} className="number-flip">0</span>
       </div>
       <div className="micro text-[var(--bone)]/60 mt-3">{label}</div>
     </div>
