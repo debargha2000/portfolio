@@ -54,10 +54,10 @@ export default function Nav() {
         ))}
       </ul>
 
-      <Link ref={mag} to="/contact" className="chip hidden md:inline-flex">
+      <Link ref={mag} to="/contact" className="chip !hidden md:!inline-flex">
         <span className="label">Start a project ↗</span>
       </Link>
-      <button onClick={() => setMenuOpen(true)} className="chip md:hidden !px-4"><span className="label">Menu</span></button>
+      <button onClick={() => setMenuOpen(true)} className="chip !inline-flex md:!hidden !px-4"><span className="label">Menu</span></button>
     </nav>
 
     {/* Mobile Menu Overlay */}
