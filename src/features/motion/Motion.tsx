@@ -132,7 +132,7 @@ export function Counter({
 export function Magnetic({
   children,
   className = "",
-  strength = 0.35,
+  strength = 0.175,
 }: {
   children: React.ReactNode;
   className?: string;

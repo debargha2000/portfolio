@@ -17,6 +17,7 @@ html.lenis body {
   overscroll-behavior: contain;
 }
 
+
 /* Project card image warp container */
 .warp-img {
   width: 100%;
@@ -146,4 +147,29 @@ details.faq[open] .faq-plus { transform: rotate(135deg); }
      1px -1px 0 #000,
     -1px  1px 0 #000,
      1px  1px 0 #000;
+}
+
+/* Chip / Button */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 1.5rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(244, 241, 234, 0.15);
+  color: var(--bone, #f4f1ea);
+  background: transparent;
+  font-family: "Inter Tight", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  text-decoration: none;
+  cursor: pointer;
+}
+.chip:hover {
+  background: rgba(244, 241, 234, 0.05);
+  border-color: rgba(244, 241, 234, 0.3);
+  color: var(--acid, #c6ff3d);
 }

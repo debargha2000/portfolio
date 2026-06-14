@@ -90,7 +90,7 @@ const CATEGORIES = ["All", "Identity", "Web", "Art Direction", "3D", "Editorial"
 
 export default function Work() {
   const [filter, setFilter] = useState("All");
-  const mag = useMagnetic<HTMLDivElement>(0.25);
+  const mag = useMagnetic<HTMLDivElement>(0.125);
 
   const filtered = useMemo(() => {
     return filter === "All"

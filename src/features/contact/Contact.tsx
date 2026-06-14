@@ -116,9 +116,9 @@ export default function Contact() {
               <p className="text-xs uppercase tracking-widest text-[var(--bone)]/50 max-w-md">
                 Every enquiry is read by a partner within two working days.
               </p>
-              <Magnetic strength={0.4}>
+              <Magnetic strength={0.2}>
                 <button type="submit" className="chip !text-sm !px-8 !py-3 !bg-[var(--acid)] !text-[var(--bg)] !border-[var(--acid)] glow-pulse">
-                  {submitted ? "✓ Sent — we'll be in touch" : "Send enquiry →"}
+                  {submitted ? "✓ Sent — we'll be in touch" : "Submit Inquiry"}
                 </button>
               </Magnetic>
             </div>

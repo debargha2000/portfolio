@@ -42,5 +42,8 @@ body {
   color: var(--fg);
   font-family: "Inter Tight", sans-serif;
   font-weight: 400;
+}
+
+#root {
   overflow-x: hidden;
 }

@@ -1,4 +1,4 @@
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { vertexShader, fragmentShader } from './shaders/inkCanvasShaders';
@@ -42,12 +42,28 @@ const ShaderPlane = () => {
 };
 
 export function InkCanvas() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(true);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { rootMargin: '0px' }
+    );
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <div className="h-full w-full">
+    <div ref={containerRef} className="h-full w-full">
       <Canvas
         camera={{ position: [0, 0, 1] }}
-        dpr={[1, 1.5]}
-        gl={{ antialias: false }} // Turn off antialias for performance on full screen shader
+        dpr={[1, window.devicePixelRatio || 2]}
+        gl={{ antialias: false, powerPreference: "high-performance", alpha: false }}
+        frameloop={isVisible ? "always" : "demand"}
       >
         <ShaderPlane />
       </Canvas>

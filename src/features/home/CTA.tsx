@@ -17,7 +17,7 @@ export default function CTA() {
         <p className="text-[15px] leading-[1.7] text-[var(--bone)]/70 max-w-xl mx-auto mt-10 mb-12 font-sans font-light">
           We take on a handful of engagements each year — enough to do each one properly. If you have a project that deserves care, we'd love to hear about it.
         </p>
-        <Magnetic strength={0.5}>
+        <Magnetic strength={0.25}>
           <Link to="/contact" className="chip !text-sm !px-8 !py-4 !border-[var(--acid)] !text-[var(--bg)] !bg-[var(--acid)] glow-pulse ripple">
             <span className="label">Start the conversation ↗</span>
           </Link>

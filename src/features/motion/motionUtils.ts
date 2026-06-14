@@ -70,7 +70,7 @@ export function useCircleReveal<T extends HTMLElement>(delay = 0) {
 
 /* ---------- Magnetic ---------- */
 // Pulls an element toward the cursor within a radius.
-export function useMagnetic<T extends HTMLElement>(strength = 0.35) {
+export function useMagnetic<T extends HTMLElement>(strength = 0.175) {
   const ref = useRef<T>(null);
   useEffect(() => {
     const el = ref.current;
@@ -78,12 +78,21 @@ export function useMagnetic<T extends HTMLElement>(strength = 0.35) {
     let raf = 0;
     let tx = 0, ty = 0, cx = 0, cy = 0;
     let running = false;
+    let rect: DOMRect | null = null;
+    let lastScroll = window.scrollY;
+    
+    // Hint for hardware acceleration
+    el.style.willChange = "transform";
+
     const onMove = (e: MouseEvent) => {
-      const r = el.getBoundingClientRect();
-      const mx = e.clientX - (r.left + r.width / 2);
-      const my = e.clientY - (r.top + r.height / 2);
+      if (!rect || Math.abs(window.scrollY - lastScroll) > 10) {
+        rect = el.getBoundingClientRect();
+        lastScroll = window.scrollY;
+      }
+      const mx = e.clientX - (rect.left + rect.width / 2);
+      const my = e.clientY - (rect.top + rect.height / 2);
       const dist = Math.hypot(mx, my);
-      const max = Math.max(r.width, r.height);
+      const max = Math.max(rect.width, rect.height);
       if (dist < max) {
         tx = mx * strength;
         ty = my * strength;
@@ -115,7 +124,7 @@ export function useMagnetic<T extends HTMLElement>(strength = 0.35) {
 }
 
 /* ---------- 3D tilt on mouse ---------- */
-export function useTilt<T extends HTMLElement>(max = 12) {
+export function useTilt<T extends HTMLElement>(max = 6) {
   const ref = useRef<T>(null);
   useEffect(() => {
     const el = ref.current;
@@ -123,6 +132,11 @@ export function useTilt<T extends HTMLElement>(max = 12) {
     let raf = 0;
     let tx = 0, ty = 0, cx = 0, cy = 0;
     let running = false;
+    let rect: DOMRect | null = null;
+    let lastScroll = window.scrollY;
+
+    el.style.willChange = "transform";
+
     const startLoop = () => {
       if (!running) {
         running = true;
@@ -130,9 +144,12 @@ export function useTilt<T extends HTMLElement>(max = 12) {
       }
     };
     const onMove = (e: MouseEvent) => {
-      const r = el.getBoundingClientRect();
-      const px = (e.clientX - r.left) / r.width - 0.5;
-      const py = (e.clientY - r.top) / r.height - 0.5;
+      if (!rect || Math.abs(window.scrollY - lastScroll) > 10) {
+        rect = el.getBoundingClientRect();
+        lastScroll = window.scrollY;
+      }
+      const px = (e.clientX - rect.left) / rect.width - 0.5;
+      const py = (e.clientY - rect.top) / rect.height - 0.5;
       tx = -py * max;
       ty = px * max;
       startLoop();
@@ -312,6 +329,7 @@ export function useParallax<T extends HTMLElement>(speed = 0.2) {
   useEffect(() => {
     if (!ref.current) return;
     const el = ref.current;
+    el.style.willChange = "transform";
     const st = ScrollTrigger.create({
       trigger: el,
       start: "top bottom",
@@ -332,32 +350,30 @@ export function useScrollSkew<T extends HTMLElement>(max = 8) {
   const ref = useRef<T>(null);
   useEffect(() => {
     if (!ref.current) return;
-    let skew = 0, target = 0;
-    let last = window.scrollY;
-    let raf = 0;
-    let running = false;
-    const loop = () => {
-      target = Math.max(-max, Math.min(max, (window.scrollY - last) * 0.05));
-      last = window.scrollY;
-      skew += (target - skew) * 0.1;
-      if (ref.current) ref.current.style.transform = `skewY(${skew}deg)`;
-      if (Math.abs(target) < 0.01 && Math.abs(skew) < 0.01) {
-        running = false;
-        return;
+    const el = ref.current;
+    el.style.willChange = "transform";
+    
+    let proxy = { skew: 0 };
+    let setter = gsap.quickSetter(el, "skewY", "deg");
+    let clamp = gsap.utils.clamp(-max, max);
+    
+    const st = ScrollTrigger.create({
+      onUpdate: (self) => {
+        let skew = clamp(self.getVelocity() / -150);
+        if (Math.abs(skew) > Math.abs(proxy.skew)) {
+          proxy.skew = skew;
+          gsap.to(proxy, {
+            skew: 0,
+            duration: 0.8,
+            ease: "power3.out",
+            overwrite: true,
+            onUpdate: () => setter(proxy.skew)
+          });
+        }
       }
-      raf = requestAnimationFrame(loop);
-    };
-    const onScroll = () => {
-      if (!running) {
-        running = true;
-        raf = requestAnimationFrame(loop);
-      }
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      cancelAnimationFrame(raf);
-    };
+    });
+    
+    return () => st.kill();
   }, [max]);
   return ref;
 }

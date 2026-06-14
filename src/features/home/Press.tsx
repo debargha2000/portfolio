@@ -61,7 +61,7 @@ export default function Press() {
 
       <div className="mt-20 flex flex-wrap gap-3">
         {["Awwwards SOTD × 6", "FWA of the Day × 3", "D&AD Wood Pencil", "TDC Certificate", "CSSDA Best UI", "It's Nice That", "Site Inspire", "Godly", "Stack Award Nom.", "European Design Longlist"].map((a) => (
-          <Magnetic key={a} strength={0.2}>
+          <Magnetic key={a} strength={0.1}>
             <span className="chip shine glow-hover"><span className="label">{a}</span></span>
           </Magnetic>
         ))}

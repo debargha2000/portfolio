@@ -4,7 +4,7 @@ import { Scramble } from "../../features/motion/Motion";
 import { useMagnetic } from "../../features/motion/motionUtils";
 
 export default function Nav() {
-  const mag = useMagnetic<HTMLAnchorElement>(0.4);
+  const mag = useMagnetic<HTMLAnchorElement>(0.2);
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
