@@ -1,0 +1,64 @@
+/* Custom cursor */
+body {
+  cursor: none;
+}
+
+.cursor-dot,
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: difference;
+  border-radius: 9999px;
+  transform: translate(-50%, -50%);
+}
+.cursor-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--orange);
+  transition: background 0.3s ease;
+}
+.cursor-dot.in-hero {
+  background: var(--acid);
+}
+.cursor-ring {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--orange);
+  transition: width 0.25s ease, height 0.25s ease, background 0.25s ease, border-color 0.3s ease;
+}
+.cursor-ring.in-hero {
+  border-color: var(--acid);
+}
+.cursor-ring.hover {
+  width: 72px;
+  height: 72px;
+  background: var(--orange);
+  mix-blend-mode: difference;
+}
+.cursor-ring.hover.in-hero {
+  background: var(--acid);
+}
+
+/* Selection */
+::selection {
+  background: var(--acid);
+  color: var(--bg);
+}
+
+/* Spotlight cursor glow */
+.cursor-glow {
+  position: fixed;
+  top: 0; left: 0;
+  width: 600px; height: 600px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+  transform: translate3d(-50%, -50%, 0);
+  background: radial-gradient(circle, rgba(255,95,0,0.15) 0%, rgba(255,95,0,0) 60%);
+  mix-blend-mode: screen;
+  transition: opacity 0.3s ease;
+  will-change: transform;
+}

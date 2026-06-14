@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import gsap from "gsap";
 import type { PreloadTask } from "./usePreloader";
+import styles from "./Preloader.module.css";
 
 interface Props {
   progress: number;
@@ -100,7 +101,7 @@ export default function Preloader({
   }, [onRetry]);
 
   return (
-    <div ref={root} className="preloader">
+    <div ref={root} className={styles.preloader}>
       <div className="absolute top-8 left-8 flex items-center gap-3 text-xs uppercase tracking-widest">
         <span className={`w-2 h-2 rounded-full bg-[var(--acid)] ${stage === 'downloading' ? 'blink' : 'opacity-100'}`} />
         {stageText} — KV/26

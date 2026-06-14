@@ -1,0 +1,131 @@
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 0;
+  display: none;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+/* Project card image warp container */
+.warp-img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+/* Project card: image zoom */
+.project-img { transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1); }
+.group:hover .project-img { transform: scale(1.08); }
+
+/* Card 3d tilt */
+.tilt-card {
+  transition: box-shadow 0.5s ease;
+  will-change: transform;
+}
+.tilt-card:hover { box-shadow: 0 30px 80px -20px rgba(198,255,61,0.25); }
+
+/* Timeline progress line */
+.timeline-progress {
+  position: absolute;
+  left: 0; top: 0;
+  height: 100%;
+  width: 2px;
+  background: linear-gradient(180deg, var(--acid), var(--orange));
+  transform-origin: top;
+  transform: scaleY(0);
+}
+
+/* Focus underline for inputs */
+.input-line {
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid rgba(244,241,234,0.2);
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+.input-line:focus { border-color: var(--acid); }
+
+/* Scroll progress bar */
+.scroll-progress {
+  position: fixed;
+  top: 0; left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--acid), var(--orange), var(--acid));
+  z-index: 100;
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: transform 0.1s linear;
+  box-shadow: 0 0 10px var(--acid);
+}
+
+/* Horizontal scroll section */
+.horizontal-scroll {
+  display: flex;
+  gap: 2rem;
+  will-change: transform;
+}
+
+/* Sticky scroll */
+.sticky-scroll {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Big next-project hover */
+.next-project-link {
+  display: block;
+  position: relative;
+  overflow: hidden;
+}
+.next-project-link .np-bg {
+  position: absolute;
+  inset: 0;
+  transform: translateY(101%);
+  background: var(--acid);
+  transition: transform 0.8s cubic-bezier(0.77, 0, 0.175, 1);
+  z-index: 0;
+}
+.next-project-link:hover .np-bg { transform: translateY(0); }
+.next-project-link .np-text {
+  position: relative;
+  z-index: 1;
+  transition: color 0.4s ease;
+}
+.next-project-link:hover .np-text { color: var(--bg); }
+
+/* FAQ smooth open */
+details.faq { border-bottom: 1px solid rgba(244,241,234,0.1); }
+details.faq summary { list-style: none; cursor: pointer; }
+details.faq summary::-webkit-details-marker { display: none; }
+details.faq .faq-body {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.6s cubic-bezier(0.77, 0, 0.175, 1);
+}
+details.faq[open] .faq-body { max-height: 400px; }
+details.faq .faq-plus { transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1); }
+details.faq[open] .faq-plus { transform: rotate(135deg); }
+
+/* Hero text stroke morph */
+.hero-morph-text {
+  -webkit-text-stroke: 1px rgba(0, 0, 0, 0.4);
+}
+.no-stroke {
+  -webkit-text-stroke: 0;
+}

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { UnderlineLink } from "../shared/components/ui/UnderlineLink";
 
 export default function Footer() {
   const [time, setTime] = useState("");
@@ -32,11 +32,11 @@ export default function Footer() {
         <div>
           <div className="tiny text-[var(--bone)]/40 mb-4">Navigate</div>
           <ul className="space-y-2 font-sans text-sm font-light">
-            <li><Link to="/" className="u-link">Home</Link></li>
-            <li><Link to="/work" className="u-link">Work archive</Link></li>
-            <li><Link to="/studio" className="u-link">Studio</Link></li>
-            <li><Link to="/process" className="u-link">Process</Link></li>
-            <li><Link to="/contact" className="u-link">Contact</Link></li>
+            <li><UnderlineLink to="/">Home</UnderlineLink></li>
+            <li><UnderlineLink to="/work">Work archive</UnderlineLink></li>
+            <li><UnderlineLink to="/studio">Studio</UnderlineLink></li>
+            <li><UnderlineLink to="/process">Process</UnderlineLink></li>
+            <li><UnderlineLink to="/contact">Contact</UnderlineLink></li>
           </ul>
         </div>
         <div>
@@ -48,10 +48,10 @@ export default function Footer() {
         <div>
           <div className="tiny text-[var(--bone)]/40 mb-4">Elsewhere</div>
           <div className="font-sans text-sm font-light leading-[1.8]">
-            <a href="#" className="u-link">Instagram</a><br />
-            <a href="#" className="u-link">Are.na</a><br />
-            <a href="#" className="u-link">Read.cv</a><br />
-            <a href="#" className="u-link">Vimeo</a>
+            <UnderlineLink href="#">Instagram</UnderlineLink><br />
+            <UnderlineLink href="#">Are.na</UnderlineLink><br />
+            <UnderlineLink href="#">Read.cv</UnderlineLink><br />
+            <UnderlineLink href="#">Vimeo</UnderlineLink>
           </div>
         </div>
         <div>

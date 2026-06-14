@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import styles from "./TeamPortrait.module.css";
 
 export function TeamList({ team }: { team: { n: string; r: string; b: string; img: string }[] }) {
   const [portrait, setPortrait] = useState<{ img: string; x: number; y: number } | null>(null);
@@ -57,7 +58,7 @@ export function TeamList({ team }: { team: { n: string; r: string; b: string; im
       </ul>
       <div
         ref={portraitRef}
-        className={`team-portrait ${portrait ? "is-open" : ""}`}
+        className={`${styles.portrait} ${portrait ? styles.isOpen : ""}`}
         style={{ transform: "translate3d(-50%, -50%, 0) scale(1)" }}
       >
         {portrait && <img src={portrait.img} alt="" loading="lazy" className="w-full h-full object-cover" />}

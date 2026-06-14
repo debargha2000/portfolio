@@ -1,49 +1,17 @@
 import { useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
 import gsap from "gsap";
 import { WordReveal, Magnetic } from "../../features/motion/Motion";
 import { useScrollSkew } from "../../features/motion/motionUtils";
+import { useCursorSpotlight } from "../../features/shared/hooks/useCursorSpotlight";
 import { InkCanvas } from "./InkCanvas";
+import { Chip } from "../../features/shared/components/ui/Chip";
 
 export default function Hero() {
   const root = useRef<HTMLElement>(null);
   const skew = useScrollSkew<HTMLDivElement>(4);
 
   // Cursor spotlight
-  useEffect(() => {
-    const el = root.current;
-    if (!el) return;
-    
-    let r = el.getBoundingClientRect();
-    const onResize = () => { r = el.getBoundingClientRect(); };
-    window.addEventListener("resize", onResize);
-    
-    let raf: number;
-    let ticking = false;
-    let mx = 0, my = 0;
-
-    const update = () => {
-      el.style.setProperty("--mx", `${mx - r.left}px`);
-      el.style.setProperty("--my", `${my - r.top}px`);
-      ticking = false;
-    };
-
-    const onMove = (e: MouseEvent) => {
-      mx = e.clientX;
-      my = e.clientY;
-      if (!ticking) {
-        raf = requestAnimationFrame(update);
-        ticking = true;
-      }
-    };
-    
-    el.addEventListener("mousemove", onMove);
-    return () => {
-      window.removeEventListener("resize", onResize);
-      el.removeEventListener("mousemove", onMove);
-      cancelAnimationFrame(raf);
-    };
-  }, []);
+  useCursorSpotlight(root);
 
   // One-time reveal of the headline lines
   useEffect(() => {
@@ -109,15 +77,15 @@ export default function Hero() {
           </WordReveal>
           <div className="flex items-center gap-3 flex-wrap">
             <Magnetic>
-              <Link to="/work" className="chip group ripple !border-white !text-white">
+              <Chip to="/work" className="group ripple !border-white !text-white">
                 <span className="w-1.5 h-1.5 rounded-full bg-white group-hover:bg-[var(--bg)]" />
                 <span className="label">View the archive</span>
-              </Link>
+              </Chip>
             </Magnetic>
             <Magnetic>
-              <Link to="/contact" className="chip ripple !bg-white !text-[var(--bg)] !border-white">
+              <Chip to="/contact" className="ripple !bg-white !text-[var(--bg)] !border-white">
                 <span className="label">Start a project ↗</span>
-              </Link>
+              </Chip>
             </Magnetic>
           </div>
         </div>
