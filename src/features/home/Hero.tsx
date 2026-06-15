@@ -1,10 +1,11 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, Suspense, lazy } from "react";
 import gsap from "gsap";
 import { WordReveal, Magnetic } from "../../features/motion/Motion";
 import { useScrollSkew } from "../../features/motion/motionUtils";
 import { useCursorSpotlight } from "../../features/shared/hooks/useCursorSpotlight";
-import { InkCanvas } from "./InkCanvas";
 import { Chip } from "../../features/shared/components/ui/Chip";
+
+const InkCanvas = lazy(() => import("./InkCanvas").then(module => ({ default: module.InkCanvas })));
 
 export default function Hero() {
   const root = useRef<HTMLElement>(null);
@@ -15,6 +16,13 @@ export default function Hero() {
 
   // One-time reveal of the headline lines
   useEffect(() => {
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReducedMotion) {
+      gsap.set([".h-l1", ".h-l2", ".h-l3"], { yPercent: 0 });
+      gsap.set(".h-meta", { opacity: 1, y: 0 });
+      return;
+    }
+
     const tl = gsap.timeline({ delay: 0.2 });
     tl.fromTo(".h-l1", { yPercent: 110 }, { yPercent: 0, duration: 1.2, ease: "expo.out" })
       .fromTo(".h-l2", { yPercent: 110 }, { yPercent: 0, duration: 1.2, ease: "expo.out" }, "-=0.95")
@@ -25,7 +33,9 @@ export default function Hero() {
   return (
     <section ref={root} className="hero-section relative min-h-[100svh] w-full flex flex-col justify-between px-6 md:px-10 pt-32 pb-10 md:pb-12 overflow-hidden">
       <div className="absolute inset-0 z-0 overflow-hidden bg-black">
-        <InkCanvas />
+        <Suspense fallback={null}>
+          <InkCanvas />
+        </Suspense>
       </div>
       <div className="hero-spotlight absolute inset-0 z-[1] pointer-events-none" />
       <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg)]/30 via-transparent to-[var(--bg)]/30 z-[2]" />

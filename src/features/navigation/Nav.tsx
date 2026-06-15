@@ -57,17 +57,37 @@ export default function Nav() {
       <Link ref={mag} to="/contact" className="chip !hidden md:!inline-flex">
         <span className="label">Start a project ↗</span>
       </Link>
-      <button onClick={() => setMenuOpen(true)} className="chip !inline-flex md:!hidden !px-4"><span className="label">Menu</span></button>
+      <button 
+        onClick={() => setMenuOpen(true)} 
+        className="chip !inline-flex md:!hidden !px-4"
+        aria-expanded={menuOpen}
+        aria-controls="mobile-menu"
+        aria-label="Open mobile menu"
+      >
+        <span className="label">Menu</span>
+      </button>
     </nav>
 
     {/* Mobile Menu Overlay */}
-    <div className={`fixed inset-0 z-[60] bg-[var(--bg)] transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] ${menuOpen ? "translate-y-0" : "-translate-y-full"}`}>
+    <div 
+      id="mobile-menu"
+      role="dialog"
+      aria-modal="true"
+      aria-hidden={!menuOpen}
+      className={`fixed inset-0 z-[60] bg-[var(--bg)] transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] ${menuOpen ? "translate-y-0" : "-translate-y-full"}`}
+    >
       <div className="absolute top-0 left-0 right-0 px-6 py-6 flex justify-between items-center border-b border-[var(--bone)]/10">
         <Link to="/" className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.22em] font-medium text-white">
           <span className="inline-block w-2 h-2 rounded-full bg-[var(--orange)]" />
           DEBARGHA
         </Link>
-        <button onClick={() => setMenuOpen(false)} className="chip !px-4 !border-white/20 !text-white"><span className="label">Close</span></button>
+        <button 
+          onClick={() => setMenuOpen(false)} 
+          className="chip !px-4 !border-white/20 !text-white"
+          aria-label="Close mobile menu"
+        >
+          <span className="label">Close</span>
+        </button>
       </div>
       <div className="flex flex-col justify-center h-full px-6 gap-6">
         {[

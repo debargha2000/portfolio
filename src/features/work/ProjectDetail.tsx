@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import { useParams, Link } from "react-router-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -158,6 +159,7 @@ export default function ProjectDetail() {
   if (!p) {
     return (
       <main className="pt-40 pb-40 px-6 md:px-10">
+        <Helmet><title>Project Not Found — DEBARGHA MORIARTY</title></Helmet>
         <h1 className="font-display text-7xl">Project not found</h1>
         <Link to="/work" className="chip mt-8 inline-block">Back to archive ↗</Link>
       </main>
@@ -166,6 +168,10 @@ export default function ProjectDetail() {
 
   return (
     <>
+    <Helmet>
+      <title>{p.title} — DEBARGHA MORIARTY</title>
+      <meta name="description" content={p.subtitle} />
+    </Helmet>
     <ProjectProgress />
     <main className="pt-32 md:pt-40">
       {/* Prev / next bar with scramble */}

@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { CharReveal, WordReveal, Magnetic, Scramble } from "../../features/motion/Motion";
 import { TeamList } from "./TeamList";
 import { Timeline } from "./Timeline";
@@ -35,6 +36,10 @@ export default function Studio() {
 
   return (
     <main className="pt-32 md:pt-40 pb-20 px-6 md:px-10">
+      <Helmet>
+        <title>Studio — DEBARGHA MORIARTY</title>
+        <meta name="description" content="A studio, not an agency. Six makers, zero layers." />
+      </Helmet>
       <div className="mb-20 md:mb-32">
         <div className="text-xs uppercase tracking-widest text-[var(--acid)] mb-6">◉ Studio — Chapter 02</div>
         <CharReveal as="h1" className="font-display text-[16vw] md:text-[11vw] leading-[0.85] tracking-tight">

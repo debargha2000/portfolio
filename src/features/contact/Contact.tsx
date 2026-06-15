@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { CharReveal, WordReveal, Magnetic, Scramble } from "../../features/motion/Motion";
@@ -64,6 +65,10 @@ export default function Contact() {
 
   return (
     <main className="pt-32 md:pt-40 pb-20 px-6 md:px-10">
+      <Helmet>
+        <title>Contact — DEBARGHA MORIARTY</title>
+        <meta name="description" content="Let's make something worth it. Start a conversation with us." />
+      </Helmet>
       <div className="mb-20 md:mb-32">
         <CharReveal as="div" className="text-xs uppercase tracking-widest text-[var(--acid)] mb-6">◉ Contact — Chapter 04</CharReveal>
         <CharReveal as="h1" className="font-display text-[16vw] md:text-[11vw] leading-[0.85] tracking-tight">

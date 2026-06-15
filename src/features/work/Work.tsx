@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect, useRef, lazy, Suspense, memo } from "react";
+import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -100,6 +101,10 @@ export default function Work() {
 
   return (
     <main className="pt-32 md:pt-40 pb-20 px-6 md:px-10">
+      <Helmet>
+        <title>Archive — DEBARGHA MORIARTY</title>
+        <meta name="description" content="A complete index of the studio's output. Record label identities, architectural flagships, and more." />
+      </Helmet>
       <div className="mb-16 md:mb-24">
         <div className="text-xs uppercase tracking-widest text-[var(--acid)] mb-6">◉ Archive — {PROJECTS.length} projects</div>
         <CharReveal as="h1" className="font-display text-[18vw] sm:text-[16vw] md:text-[13vw] lg:text-[11vw] leading-[0.85] tracking-tight">

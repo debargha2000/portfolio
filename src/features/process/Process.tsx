@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -129,6 +130,10 @@ export default function Process() {
 
   return (
     <main className="pt-32 md:pt-40 pb-20 px-6 md:px-10">
+      <Helmet>
+        <title>Process — DEBARGHA MORIARTY</title>
+        <meta name="description" content="Four movements. A deliberate pace that respects the work and the people it's for." />
+      </Helmet>
       <div className="mb-20 md:mb-32">
         <CharReveal as="div" className="text-xs uppercase tracking-widest text-[var(--acid)] mb-6">◉ Process — Chapter 03</CharReveal>
         <CharReveal as="h1" className="font-display text-[16vw] md:text-[11vw] leading-[0.85] tracking-tight">
