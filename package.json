@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "cross-env NODE_OPTIONS=\"--no-warnings=DeprecationWarning\" vite",
     "build": "cross-env NODE_OPTIONS=\"--no-warnings=DeprecationWarning\" vite build",
-    "preview": "cross-env NODE_OPTIONS=\"--no-warnings=DeprecationWarning\" vite preview"
+    "preview": "cross-env NODE_OPTIONS=\"--no-warnings=DeprecationWarning\" vite preview",
+    "test": "vitest run"
   },
   "dependencies": {
     "@react-three/fiber": "^9.6.1",
@@ -22,13 +23,16 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.1",
+    "@testing-library/react": "^16.3.2",
     "@types/node": "22.19.17",
     "@types/react": "19.2.7",
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "^5.2.0",
     "cross-env": "^10.1.0",
+    "jsdom": "^29.1.1",
     "tailwindcss": "4.1.17",
     "typescript": "5.9.3",
-    "vite": "^8.0.16"
+    "vite": "^8.0.16",
+    "vitest": "^4.1.9"
   }
 }

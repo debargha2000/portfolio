@@ -1,1 +1,18 @@
 node_modules
+
+# Production builds
+dist
+dist-ssr
+
+# Local testing files
+*.test.ts
+*.test.tsx
+src/setupTests.ts
+coverage/
+
+# Local LLM instruction folders
+.gemini/
+
+# Misc
+.DS_Store
+*.local
