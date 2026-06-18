@@ -1,4 +1,4 @@
-import { useRef, useMemo, useState, useEffect, Suspense } from "react";
+import { useRef, useMemo, useState, useEffect } from "react";
 import { useMediaQuery } from "../../features/shared/hooks/useMediaQuery";
 
 // Only import R3F types for TypeScript — actual module loaded dynamically
