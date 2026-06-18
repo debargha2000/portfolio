@@ -12,6 +12,8 @@ coverage/
 
 # Local LLM instruction folders
 .gemini/
+.claude/
+.vscode/
 
 # Misc
 .DS_Store
