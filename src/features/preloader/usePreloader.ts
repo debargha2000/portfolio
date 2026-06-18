@@ -62,16 +62,26 @@ const TASKS: PreloadTask[] = [
   {
     id: 'project-assets',
     name: 'Project Assets',
-    weight: 20,
+    weight: 5,
     critical: false,
     load: async (onProgress) => {
-      const images = PROJECTS.flatMap(p => [
-        p.thumbnail,
-        p.hero,
-        ...p.blocks.flatMap(b => [b.src, b.src2]).filter(Boolean)
-      ]) as string[];
+      // Connection-aware: skip heavy preloading on slow networks
+      const nav = navigator as any;
+      const isSlowConnection = nav.connection && 
+        (nav.connection.effectiveType === '2g' || nav.connection.effectiveType === '3g' || nav.connection.effectiveType === 'slow-2g');
       
-      const uniqueImages = [...new Set(images)];
+      if (isSlowConnection) {
+        if (onProgress) onProgress(1, 1);
+        return;
+      }
+
+      // Only preload hero + first 3 thumbnails (critical above-fold content)
+      // Remaining images use native loading="lazy" as the user scrolls
+      const criticalImages = [
+        '/images/hero-ink.jpg',
+        ...PROJECTS.slice(0, 3).map(p => p.thumbnail),
+      ];
+      const uniqueImages = [...new Set(criticalImages)];
       
       let loaded = 0;
       await Promise.all(uniqueImages.map(url => 

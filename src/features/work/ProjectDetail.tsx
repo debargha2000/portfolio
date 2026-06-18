@@ -19,7 +19,7 @@ const FullBleed = React.memo(function FullBleed({ b }: { b: CaseBlock }) {
   return (
     <figure ref={(n) => { (parallax as any).current = n; (clip as any).current = n; }} className="my-20 md:my-32 -mx-6 md:-mx-10">
       <div className="relative aspect-[21/10] w-full overflow-hidden">
-        <img src={b.src} alt={b.caption ?? ""} loading="lazy" className="w-full h-full object-cover transition-transform duration-[2s] hover:scale-105" />
+        <img src={b.src} alt={b.caption ?? ""} loading="lazy" decoding="async" className="w-full h-full object-cover transition-transform duration-[2s] hover:scale-105" />
       </div>
       {b.caption && (
         <figcaption className="px-6 md:px-10 mt-4 text-xs uppercase tracking-widest text-[var(--bone)]/60">
@@ -35,7 +35,7 @@ const ImgBlock = React.memo(function ImgBlock({ b }: { b: CaseBlock }) {
   return (
     <figure ref={clip} className="my-16 md:my-24 group">
       <div className="relative aspect-[3/2] w-full overflow-hidden">
-        <img src={b.src} alt={b.caption ?? ""} loading="lazy" className="w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-105" />
+        <img src={b.src} alt={b.caption ?? ""} loading="lazy" decoding="async" className="w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-105" />
       </div>
       {b.caption && (
         <figcaption className="mt-4 text-xs uppercase tracking-widest text-[var(--bone)]/60">↗ {b.caption}</figcaption>
@@ -50,10 +50,10 @@ const ImgPair = React.memo(function ImgPair({ b }: { b: CaseBlock }) {
   return (
     <figure className="my-16 md:my-24 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
       <div ref={clip1} className="relative aspect-[4/5] overflow-hidden group">
-        <img src={b.src} alt="" loading="lazy" className="w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-110" />
+        <img src={b.src} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-110" />
       </div>
       <div ref={clip2} className="relative aspect-[4/5] overflow-hidden group">
-        <img src={b.src2} alt="" loading="lazy" className="w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-110" />
+        <img src={b.src2} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-110" />
       </div>
       {b.caption && (
         <figcaption className="md:col-span-2 text-xs uppercase tracking-widest text-[var(--bone)]/60 mt-2">↗ {b.caption}</figcaption>

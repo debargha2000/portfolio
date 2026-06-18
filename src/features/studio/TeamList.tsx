@@ -1,14 +1,20 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import styles from "./TeamPortrait.module.css";
 
 export function TeamList({ team }: { team: { n: string; r: string; b: string; img: string }[] }) {
-  const [portrait, setPortrait] = useState<{ img: string; x: number; y: number } | null>(null);
+  const [portrait, setPortrait] = useState<{ img: string } | null>(null);
   const portraitRef = useRef<HTMLDivElement>(null);
   const targetRef = useRef({ x: 0, y: 0 });
   const currentRef = useRef({ x: 0, y: 0 });
+  const rafRef = useRef(0);
 
+  // Only run rAF when portrait is shown — saves CPU when no hover
   useEffect(() => {
-    let raf = 0;
+    if (!portrait) {
+      cancelAnimationFrame(rafRef.current);
+      return;
+    }
+
     const loop = () => {
       currentRef.current.x += (targetRef.current.x - currentRef.current.x) * 0.15;
       currentRef.current.y += (targetRef.current.y - currentRef.current.y) * 0.15;
@@ -16,18 +22,17 @@ export function TeamList({ team }: { team: { n: string; r: string; b: string; im
         portraitRef.current.style.left = `${currentRef.current.x}px`;
         portraitRef.current.style.top = `${currentRef.current.y}px`;
       }
-      raf = requestAnimationFrame(loop);
+      rafRef.current = requestAnimationFrame(loop);
     };
-    loop();
-    return () => cancelAnimationFrame(raf);
-  }, []);
-
-  useEffect(() => {
-    if (portrait) {
-      targetRef.current.x = portrait.x;
-      targetRef.current.y = portrait.y;
-    }
+    rafRef.current = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(rafRef.current);
   }, [portrait]);
+
+  // Use refs for mouse position — no React re-renders on mousemove
+  const onMouseMove = useCallback((e: React.MouseEvent) => {
+    targetRef.current.x = e.clientX;
+    targetRef.current.y = e.clientY;
+  }, []);
 
   return (
     <>
@@ -36,12 +41,14 @@ export function TeamList({ team }: { team: { n: string; r: string; b: string; im
           <li
             key={m.n}
             className="py-6 grid grid-cols-12 gap-4 items-baseline group cursor-default hover:bg-[var(--acid)]/5 transition-colors px-4 -mx-4"
-            onMouseEnter={(e) => setPortrait({ img: m.img, x: e.clientX, y: e.clientY })}
-            onMouseMove={(e) => {
+            onMouseEnter={(e) => {
               targetRef.current.x = e.clientX;
               targetRef.current.y = e.clientY;
-              setPortrait({ img: m.img, x: e.clientX, y: e.clientY });
+              currentRef.current.x = e.clientX;
+              currentRef.current.y = e.clientY;
+              setPortrait({ img: m.img });
             }}
+            onMouseMove={onMouseMove}
             onMouseLeave={() => setPortrait(null)}
           >
             <div className="col-span-12 md:col-span-6 font-display text-4xl md:text-6xl leading-none group-hover:translate-x-4 transition-transform duration-500">

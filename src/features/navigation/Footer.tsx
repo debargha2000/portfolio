@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { UnderlineLink } from "../shared/components/ui/UnderlineLink";
 
 export default function Footer() {
   const [time, setTime] = useState("");
+  const footerRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const update = () => {
@@ -17,12 +18,28 @@ export default function Footer() {
       );
     };
     update();
-    const id = setInterval(update, 1000);
-    return () => clearInterval(id);
+
+    // Only tick when footer is visible
+    let id: ReturnType<typeof setInterval> | null = null;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        update();
+        id = setInterval(update, 1000);
+      } else if (id) {
+        clearInterval(id);
+        id = null;
+      }
+    });
+
+    if (footerRef.current) observer.observe(footerRef.current);
+    return () => {
+      observer.disconnect();
+      if (id) clearInterval(id);
+    };
   }, []);
 
   return (
-    <footer className="relative px-6 md:px-10 pt-28 md:pt-40 pb-10 border-t border-[var(--bone)]/15">
+    <footer ref={footerRef} className="relative px-6 md:px-10 pt-28 md:pt-40 pb-10 border-t border-[var(--bone)]/15">
       <div className="tiny text-[var(--acid)] mb-8">◉ Let's talk</div>
       <div className="font-display display-thin text-[14vw] md:text-[9vw] leading-[0.85] tracking-[-0.04em] mb-16">
         Start <span className="font-editorial italic">something</span> <span className="text-[var(--acid)] font-editorial italic">worth it</span>.

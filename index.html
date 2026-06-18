@@ -16,15 +16,9 @@
     <link rel="preload" as="font" type="font/woff2" crossorigin href="/fonts/JetBrainsMono-Medium.woff2" />
     
     <!-- Hero poster preload -->
-    <link rel="preload" as="image" href="/images/hero-ink.jpg" />
+    <link rel="preload" as="image" href="/images/hero-ink.jpg" fetchpriority="high" />
     
-    <!-- Video preload (metadata only) -->
-    <link rel="preload" as="video" href="/videos/hero-bg.mp4" type="video/mp4" />
-    
-    <!-- Google Fonts as fallback (display=swap for non-blocking) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,100..900,0..100,0..1;1,9..144,100..900,0..100,0..1&family=Instrument+Serif:ital@0;1&family=Inter+Tight:ital,wght@0,300..700;1,300..700&family=JetBrains+Mono:ital,wght@0,300..700;1,300..700&display=swap" rel="stylesheet" />
+    <!-- Self-hosted variable fonts handle all weights; no CDN needed -->
   </head>
   <body>
     <div id="root"></div>

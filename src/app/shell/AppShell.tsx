@@ -5,6 +5,7 @@ import Preloader from "../../features/preloader/Preloader";
 import { CursorProvider } from "../providers/CursorProvider";
 import { LenisProvider } from "../providers/LenisProvider";
 import { ScrollProvider } from "../providers/ScrollProvider";
+import { ErrorBoundary } from "../../features/shared/components/ErrorBoundary";
 import { Layout } from "./Layout";
 
 export function AppShell() {
@@ -54,7 +55,9 @@ export function AppShell() {
             />
           )}
           {showApp && (
-            <Layout />
+            <ErrorBoundary>
+              <Layout />
+            </ErrorBoundary>
           )}
         </ScrollProvider>
       </CursorProvider>

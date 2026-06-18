@@ -4,17 +4,43 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
+/* ─── Shared mouse position (single global listener instead of N) ─── */
+const mousePos = { x: 0, y: 0 };
+let mouseListenerAttached = false;
+let mouseSubscribers = 0;
 
+function attachMouseListener() {
+  if (mouseListenerAttached) return;
+  mouseListenerAttached = true;
+  window.addEventListener("mousemove", (e) => {
+    mousePos.x = e.clientX;
+    mousePos.y = e.clientY;
+  }, { passive: true });
+}
 
+function useSharedMouse() {
+  useEffect(() => {
+    mouseSubscribers++;
+    attachMouseListener();
+    return () => { mouseSubscribers--; };
+  }, []);
+  return mousePos;
+}
 
-
-
+/* ─── Reduced motion check ─── */
+function prefersReducedMotion(): boolean {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
 
 /* ---------- Number flip ---------- */
 export function useNumberFlip(target: number, duration = 1.5) {
   const ref = useRef<HTMLSpanElement>(null);
   useEffect(() => {
     if (!ref.current) return;
+    if (prefersReducedMotion()) {
+      ref.current.textContent = String(target);
+      return;
+    }
     const st = ScrollTrigger.create({
       trigger: ref.current,
       start: "top 85%",
@@ -45,6 +71,7 @@ export function useCircleReveal<T extends HTMLElement>(delay = 0) {
   const ref = useRef<T>(null);
   useLayoutEffect(() => {
     if (!ref.current) return;
+    if (prefersReducedMotion()) return; // show immediately
     gsap.set(ref.current, { clipPath: "circle(0% at 50% 50%)" });
     const st = ScrollTrigger.create({
       trigger: ref.current,
@@ -69,28 +96,44 @@ export function useCircleReveal<T extends HTMLElement>(delay = 0) {
 
 
 /* ---------- Magnetic ---------- */
-// Pulls an element toward the cursor within a radius.
+// Uses shared mouse position instead of individual listeners.
 export function useMagnetic<T extends HTMLElement>(strength = 0.175) {
   const ref = useRef<T>(null);
+  const mouse = useSharedMouse();
+
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    // Skip on touch devices or reduced motion
+    if (prefersReducedMotion() || window.matchMedia("(hover: none)").matches) return;
+
     let raf = 0;
     let tx = 0, ty = 0, cx = 0, cy = 0;
     let running = false;
     let rect: DOMRect | null = null;
     let lastScroll = window.scrollY;
-    
-    // Hint for hardware acceleration
-    el.style.willChange = "transform";
+    let isVisible = false;
 
-    const onMove = (e: MouseEvent) => {
+    // Only activate when visible
+    const observer = new IntersectionObserver(([entry]) => {
+      isVisible = entry.isIntersecting;
+      if (!isVisible) {
+        tx = 0; ty = 0;
+        if (running) { running = false; cancelAnimationFrame(raf); }
+        el.style.transform = '';
+      }
+    }, { rootMargin: "50px" });
+    observer.observe(el);
+
+    const loop = () => {
+      if (!isVisible) { running = false; return; }
+
       if (!rect || Math.abs(window.scrollY - lastScroll) > 10) {
         rect = el.getBoundingClientRect();
         lastScroll = window.scrollY;
       }
-      const mx = e.clientX - (rect.left + rect.width / 2);
-      const my = e.clientY - (rect.top + rect.height / 2);
+      const mx = mouse.x - (rect.left + rect.width / 2);
+      const my = mouse.y - (rect.top + rect.height / 2);
       const dist = Math.hypot(mx, my);
       const max = Math.max(rect.width, rect.height);
       if (dist < max) {
@@ -99,12 +142,7 @@ export function useMagnetic<T extends HTMLElement>(strength = 0.175) {
       } else {
         tx = 0; ty = 0;
       }
-      if (!running) {
-        running = true;
-        raf = requestAnimationFrame(loop);
-      }
-    };
-    const loop = () => {
+
       cx += (tx - cx) * 0.18;
       cy += (ty - cy) * 0.18;
       el.style.transform = `translate3d(${cx}px, ${cy}px, 0)`;
@@ -114,28 +152,39 @@ export function useMagnetic<T extends HTMLElement>(strength = 0.175) {
       }
       raf = requestAnimationFrame(loop);
     };
-    window.addEventListener("mousemove", onMove);
+
+    // Start loop only when mouse moves while element is visible
+    const checkInterval = setInterval(() => {
+      if (isVisible && !running) {
+        running = true;
+        raf = requestAnimationFrame(loop);
+      }
+    }, 100);
+
     return () => {
+      clearInterval(checkInterval);
+      observer.disconnect();
       cancelAnimationFrame(raf);
-      window.removeEventListener("mousemove", onMove);
     };
-  }, [strength]);
+  }, [strength, mouse]);
   return ref;
 }
 
 /* ---------- 3D tilt on mouse ---------- */
 export function useTilt<T extends HTMLElement>(max = 6) {
   const ref = useRef<T>(null);
+  const mouse = useSharedMouse();
+
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    if (prefersReducedMotion() || window.matchMedia("(hover: none)").matches) return;
+
     let raf = 0;
     let tx = 0, ty = 0, cx = 0, cy = 0;
     let running = false;
     let rect: DOMRect | null = null;
     let lastScroll = window.scrollY;
-
-    el.style.willChange = "transform";
 
     const startLoop = () => {
       if (!running) {
@@ -172,7 +221,7 @@ export function useTilt<T extends HTMLElement>(max = 6) {
       el.removeEventListener("mousemove", onMove);
       el.removeEventListener("mouseleave", onLeave);
     };
-  }, [max]);
+  }, [max, mouse]);
   return ref;
 }
 
@@ -181,6 +230,10 @@ export function useCountUp(target: number, duration = 1.6, decimals = 0, start =
   const ref = useRef<HTMLSpanElement>(null);
   useEffect(() => {
     if (!ref.current) return;
+    if (prefersReducedMotion()) {
+      ref.current.textContent = prefix + Number(target.toFixed(decimals)).toLocaleString() + suffix;
+      return;
+    }
     const obj = { v: start };
     const st = ScrollTrigger.create({
       trigger: ref.current,
@@ -214,6 +267,7 @@ export function useCountUp(target: number, duration = 1.6, decimals = 0, start =
 const CHARS = "!<>-_\\/[]{}—=+*^?#________";
 export function useScramble() {
   const scramble = useCallback((el: HTMLElement) => {
+    if (prefersReducedMotion()) return;
     const original = el.dataset.original ?? el.textContent ?? "";
     if (!el.dataset.original) el.dataset.original = original;
     const from = original;
@@ -272,6 +326,7 @@ export function useReveal<T extends HTMLElement>(delay = 0) {
   const ref = useRef<T>(null);
   useEffect(() => {
     if (!ref.current) return;
+    if (prefersReducedMotion()) return; // show immediately
     const st = ScrollTrigger.create({
       trigger: ref.current,
       start: "top 88%",
@@ -296,6 +351,7 @@ export function useClipReveal<T extends HTMLElement>(variant: "circle" | "h" | "
   const ref = useRef<T>(null);
   useLayoutEffect(() => {
     if (!ref.current) return;
+    if (prefersReducedMotion()) return; // show immediately
     const initial =
       variant === "circle"
         ? "circle(0% at 50% 50%)"
@@ -328,8 +384,8 @@ export function useParallax<T extends HTMLElement>(speed = 0.2) {
   const ref = useRef<T>(null);
   useEffect(() => {
     if (!ref.current) return;
+    if (prefersReducedMotion()) return;
     const el = ref.current;
-    el.style.willChange = "transform";
     const st = ScrollTrigger.create({
       trigger: el,
       start: "top bottom",
@@ -350,8 +406,8 @@ export function useScrollSkew<T extends HTMLElement>(max = 8) {
   const ref = useRef<T>(null);
   useEffect(() => {
     if (!ref.current) return;
+    if (prefersReducedMotion()) return;
     const el = ref.current;
-    el.style.willChange = "transform";
     
     let proxy = { skew: 0 };
     let setter = gsap.quickSetter(el, "skewY", "deg");

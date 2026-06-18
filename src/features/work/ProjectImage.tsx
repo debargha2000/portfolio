@@ -1,6 +1,7 @@
-import { useEffect, useRef } from "react";
-import * as THREE from "three";
+import { useEffect, useRef, memo } from "react";
+import { useMediaQuery } from "../../features/shared/hooks/useMediaQuery";
 
+/* ─── GLSL shaders (only used on desktop) ─── */
 const vert = /* glsl */ `
   varying vec2 vUv;
   void main() {
@@ -55,12 +56,26 @@ const frag = /* glsl */ `
   }
 `;
 
-interface Props {
-  src: string;
-  active: boolean;
-}
+/* ─── Mobile-only: CSS filter-based image (zero WebGL, zero GPU contexts) ─── */
+const MobileProjectImage = memo(function MobileProjectImage({ src, active }: { src: string; active: boolean }) {
+  return (
+    <div className="absolute inset-0 w-full h-full">
+      <img
+        src={src}
+        alt=""
+        loading="lazy"
+        decoding="async"
+        className="w-full h-full object-cover transition-[filter] duration-700"
+        style={{
+          filter: active ? "saturate(1)" : "saturate(0.55)",
+        }}
+      />
+    </div>
+  );
+});
 
-export default function ProjectImage({ src, active }: Props) {
+/* ─── Desktop-only: WebGL shader image ─── */
+const WebGLProjectImage = memo(function WebGLProjectImage({ src, active }: { src: string; active: boolean }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const hoverRef = useRef(0);
@@ -71,83 +86,90 @@ export default function ProjectImage({ src, active }: Props) {
   }, [active]);
 
   useEffect(() => {
-    const container = containerRef.current!;
-    const canvas = canvasRef.current!;
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-    const scene = new THREE.Scene();
-    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    // Dynamic import to avoid pulling Three.js into the main bundle
+    import("three").then((THREE) => {
+      const container = containerRef.current!;
+      const canvas = canvasRef.current!;
+      if (!container || !canvas) return;
 
-    const setSize = () => {
-      const w = container.clientWidth;
-      const h = container.clientHeight;
-      renderer.setSize(w, h, false);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-      uniforms.uRes.value.set(w, h);
-    };
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true });
+      const scene = new THREE.Scene();
+      const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
 
-    const tex = new THREE.TextureLoader().load(src, (t) => {
-      const img = t.image as HTMLImageElement;
-      uniforms.uImgRes.value.set(img.naturalWidth, img.naturalHeight);
-    });
-    tex.minFilter = THREE.LinearFilter;
-    tex.generateMipmaps = false;
+      const uniforms = {
+        uTexture: { value: null as any },
+        uHover: { value: 0 },
+        uTime: { value: 0 },
+        uRes: { value: new THREE.Vector2(1, 1) },
+        uImgRes: { value: new THREE.Vector2(1, 1) },
+      };
 
-    const uniforms = {
-      uTexture: { value: tex },
-      uHover: { value: 0 },
-      uTime: { value: 0 },
-      uRes: { value: new THREE.Vector2(1, 1) },
-      uImgRes: { value: new THREE.Vector2(1, 1) },
-    };
+      const setSize = () => {
+        const w = container.clientWidth;
+        const h = container.clientHeight;
+        renderer.setSize(w, h, false);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+        uniforms.uRes.value.set(w, h);
+      };
 
-    const geo = new THREE.PlaneGeometry(2, 2);
-    const mat = new THREE.ShaderMaterial({
-      vertexShader: vert,
-      fragmentShader: frag,
-      uniforms,
-    });
-    const mesh = new THREE.Mesh(geo, mat);
-    scene.add(mesh);
-
-    setSize();
-    window.addEventListener("resize", setSize);
-
-    const clock = new THREE.Clock();
-    let raf = 0;
-    let isVisible = false;
-
-    const loop = () => {
-      if (!isVisible) return;
-      uniforms.uTime.value = clock.getElapsedTime();
-      hoverRef.current += (targetRef.current - hoverRef.current) * 0.08;
-      uniforms.uHover.value = hoverRef.current;
-      renderer.render(scene, camera);
-      raf = requestAnimationFrame(loop);
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        isVisible = entry.isIntersecting;
-        if (isVisible) {
-          cancelAnimationFrame(raf);
-          raf = requestAnimationFrame(loop);
-        } else {
-          cancelAnimationFrame(raf);
-        }
+      const tex = new THREE.TextureLoader().load(src, (t: any) => {
+        const img = t.image as HTMLImageElement;
+        uniforms.uImgRes.value.set(img.naturalWidth, img.naturalHeight);
       });
-    }, { threshold: 0 });
+      tex.minFilter = THREE.LinearFilter;
+      tex.generateMipmaps = false;
+      uniforms.uTexture.value = tex;
 
-    observer.observe(container);
+      const geo = new THREE.PlaneGeometry(2, 2);
+      const mat = new THREE.ShaderMaterial({
+        vertexShader: vert,
+        fragmentShader: frag,
+        uniforms,
+      });
+      const mesh = new THREE.Mesh(geo, mat);
+      scene.add(mesh);
 
-    return () => {
-      observer.disconnect();
-      cancelAnimationFrame(raf);
-      window.removeEventListener("resize", setSize);
-      renderer.dispose();
-      geo.dispose();
-      mat.dispose();
-      tex.dispose();
-    };
+      setSize();
+      window.addEventListener("resize", setSize);
+
+      const clock = new THREE.Clock();
+      let raf = 0;
+      let isVisible = false;
+
+      const loop = () => {
+        if (!isVisible) return;
+        uniforms.uTime.value = clock.getElapsedTime();
+        hoverRef.current += (targetRef.current - hoverRef.current) * 0.08;
+        uniforms.uHover.value = hoverRef.current;
+        renderer.render(scene, camera);
+        raf = requestAnimationFrame(loop);
+      };
+
+      // Only render when visible — prevents GPU waste
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          isVisible = entry.isIntersecting;
+          if (isVisible) {
+            cancelAnimationFrame(raf);
+            raf = requestAnimationFrame(loop);
+          } else {
+            cancelAnimationFrame(raf);
+          }
+        });
+      }, { threshold: 0, rootMargin: "200px" });
+
+      observer.observe(container);
+
+      return () => {
+        observer.disconnect();
+        cancelAnimationFrame(raf);
+        window.removeEventListener("resize", setSize);
+        renderer.dispose();
+        geo.dispose();
+        mat.dispose();
+        tex.dispose();
+      };
+    });
   }, [src]);
 
   return (
@@ -158,4 +180,20 @@ export default function ProjectImage({ src, active }: Props) {
       <canvas ref={canvasRef} className="w-full h-full block" />
     </div>
   );
+});
+
+/* ─── Main export: auto-selects mobile vs desktop ─── */
+interface Props {
+  src: string;
+  active: boolean;
+}
+
+export default function ProjectImage({ src, active }: Props) {
+  const isMobile = useMediaQuery("(max-width: 767px)");
+
+  if (isMobile) {
+    return <MobileProjectImage src={src} active={active} />;
+  }
+
+  return <WebGLProjectImage src={src} active={active} />;
 }

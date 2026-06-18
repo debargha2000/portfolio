@@ -1,7 +1,7 @@
 /* Noise grain overlay */
 .grain {
   position: fixed;
-  inset: -50%;
+  inset: -10%;
   pointer-events: none;
   z-index: 60;
   opacity: 0.04;
@@ -10,6 +10,7 @@
   will-change: transform;
   transform-style: preserve-3d;
   backface-visibility: hidden;
+  contain: strict;
 }
 @keyframes grain {
   0%, 100% { transform: translate(0, 0); }
@@ -216,4 +217,21 @@
   100% {
     transform: scale(1.1) translate(1%, 1%);
   }
+}
+
+/* ─── Reduced motion: disable all continuous/decorative animations ─── */
+@media (prefers-reduced-motion: reduce) {
+  .grain { animation: none; opacity: 0.02; }
+  .marquee-track { animation: none; }
+  .glow-pulse { animation: none; }
+  .spin-slow { animation: none; }
+  .float { animation: none; }
+  .distort-bg { animation: none; }
+  .morph-shape { animation: none; }
+  .gradient-mesh { animation: none; }
+  .slot-pulse { animation: none; }
+  .blink { animation: none; opacity: 1; }
+  .page-curtain.is-running { animation: none; transform: translateY(-101%); }
+  .shine::before { transition: none; }
+  .reveal-mask > span { transform: none; }
 }

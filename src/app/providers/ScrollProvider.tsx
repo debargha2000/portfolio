@@ -20,15 +20,25 @@ function ScrollToTop() {
 function ScrollProgressBar() {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    const onScroll = () => {
+    // Use Lenis scroll event if available (avoids duplicate scroll listener)
+    const lenis = window.__lenis;
+    
+    const update = () => {
       if (!ref.current) return;
       const h = document.documentElement;
       const p = h.scrollTop / (h.scrollHeight - h.clientHeight || 1);
       ref.current.style.transform = `scaleX(${Math.max(0, Math.min(1, p))})`;
     };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
-    return () => window.removeEventListener("scroll", onScroll);
+    
+    if (lenis) {
+      lenis.on("scroll", update);
+      return () => lenis.off("scroll", update);
+    } else {
+      // Fallback for when Lenis isn't available yet
+      window.addEventListener("scroll", update, { passive: true });
+      update();
+      return () => window.removeEventListener("scroll", update);
+    }
   }, []);
   return <div ref={ref} className="scroll-progress" />;
 }

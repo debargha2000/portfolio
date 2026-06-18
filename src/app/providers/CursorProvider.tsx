@@ -22,12 +22,25 @@ export function CursorProvider({ children }: { children: React.ReactNode }) {
 
     let running = false;
     let raf = 0;
+    let willChangeTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const setWillChange = (active: boolean) => {
+      const val = active ? "transform" : "auto";
+      if (dot.current) dot.current.style.willChange = val;
+      if (ring.current) ring.current.style.willChange = val;
+      if (glow.current) glow.current.style.willChange = val;
+    };
 
     const onMove = (e: MouseEvent) => {
       mx.x = e.clientX;
       mx.y = e.clientY;
       gx = e.clientX;
       gy = e.clientY;
+
+      // Activate will-change while moving
+      if (willChangeTimer) clearTimeout(willChangeTimer);
+      setWillChange(true);
+      willChangeTimer = setTimeout(() => setWillChange(false), 3000);
 
       if (!running) {
         running = true;
@@ -81,6 +94,8 @@ export function CursorProvider({ children }: { children: React.ReactNode }) {
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("mouseover", onOver);
       cancelAnimationFrame(raf);
+      if (willChangeTimer) clearTimeout(willChangeTimer);
+      setWillChange(false);
     };
   }, [shouldDisable]);
 
@@ -88,9 +103,9 @@ export function CursorProvider({ children }: { children: React.ReactNode }) {
     <>
       {!shouldDisable && (
         <>
-          <div ref={glow} className="cursor-glow hidden md:block" style={{ willChange: "transform", pointerEvents: "none" }} />
-          <div ref={dot} className="cursor-dot hidden md:block" style={{ willChange: "transform", pointerEvents: "none" }} />
-          <div ref={ring} className="cursor-ring hidden md:block" style={{ willChange: "transform", pointerEvents: "none" }} />
+          <div ref={glow} className="cursor-glow hidden md:block" style={{ pointerEvents: "none" }} />
+          <div ref={dot} className="cursor-dot hidden md:block" style={{ pointerEvents: "none" }} />
+          <div ref={ring} className="cursor-ring hidden md:block" style={{ pointerEvents: "none" }} />
         </>
       )}
       {children}

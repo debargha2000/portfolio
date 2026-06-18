@@ -33,9 +33,12 @@ html.lenis body {
 /* Card 3d tilt */
 .tilt-card {
   transition: box-shadow 0.5s ease;
+  contain: layout style;
+}
+.tilt-card:hover {
+  box-shadow: 0 30px 80px -20px rgba(198,255,61,0.25);
   will-change: transform;
 }
-.tilt-card:hover { box-shadow: 0 30px 80px -20px rgba(198,255,61,0.25); }
 
 /* Timeline progress line */
 .timeline-progress {

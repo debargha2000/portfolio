@@ -3,6 +3,7 @@ import { useEffect, useRef } from "react";
 export default function Marquee() {
   const track1Ref = useRef<HTMLDivElement>(null);
   const track2Ref = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     if (!track1Ref.current || !track2Ref.current) return;
@@ -10,8 +11,10 @@ export default function Marquee() {
     let lastTime = performance.now();
     let currentVel = 0;
     let raf = 0;
+    let isVisible = false;
 
     const loop = () => {
+      if (!isVisible) return;
       const now = performance.now();
       const dt = Math.max(now - lastTime, 1);
       const targetVel = ((window.scrollY - lastScroll) / dt) * 16;
@@ -36,8 +39,25 @@ export default function Marquee() {
       raf = requestAnimationFrame(loop);
     };
     
-    loop();
-    return () => cancelAnimationFrame(raf);
+    // Only run animation when visible
+    const observer = new IntersectionObserver(([entry]) => {
+      isVisible = entry.isIntersecting;
+      if (isVisible) {
+        lastTime = performance.now();
+        lastScroll = window.scrollY;
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(loop);
+      } else {
+        cancelAnimationFrame(raf);
+      }
+    }, { rootMargin: "100px" });
+
+    if (sectionRef.current) observer.observe(sectionRef.current);
+
+    return () => {
+      observer.disconnect();
+      cancelAnimationFrame(raf);
+    };
   }, []);
 
   const rowA = [
@@ -50,7 +70,7 @@ export default function Marquee() {
   ];
 
   return (
-    <section className="relative py-8 md:py-12 border-y border-[var(--bone)]/10 overflow-hidden">
+    <section ref={sectionRef} className="relative py-8 md:py-12 border-y border-[var(--bone)]/10 overflow-hidden">
       <div
         ref={track1Ref}
         className="marquee-track will-change-transform"
