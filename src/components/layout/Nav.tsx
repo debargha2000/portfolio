@@ -7,7 +7,9 @@ export default function Nav() {
   const mag = useMagnetic<HTMLAnchorElement>(0.2);
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [scrolledPastHero, setScrolledPastHero] = useState(false);
   const location = useLocation();
+  const isHome = location.pathname === "/";
 
   useEffect(() => {
     let ticking = false;
@@ -16,6 +18,8 @@ export default function Nav() {
       ticking = true;
       requestAnimationFrame(() => {
         setScrolled(window.scrollY > 0);
+        // ponytail: assume hero is ~50vh for simple scroll reveal
+        setScrolledPastHero(window.scrollY > window.innerHeight * 0.5);
         ticking = false;
       });
     };
@@ -45,7 +49,7 @@ export default function Nav() {
         <span className="font-editorial italic text-base lowercase ml-0.5 normal-case tracking-normal text-[var(--acid)]">Moriarty</span>
       </Link>
 
-      <ul className="hidden md:flex items-center gap-8 font-mono text-[10px] uppercase tracking-[0.25em] font-medium">
+      <ul className={`hidden md:flex items-center gap-8 font-mono text-[10px] uppercase tracking-[0.25em] font-medium transition-all duration-700 ease-out ${isHome && !scrolledPastHero ? "opacity-0 -translate-y-4 pointer-events-none" : "opacity-100 translate-y-0"}`}>
         {[
           { to: "/work", l: "Work" },
           { to: "/studio", l: "Studio" },
