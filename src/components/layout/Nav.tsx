@@ -51,14 +51,16 @@ export default function Nav() {
 
       <ul className={`hidden md:flex items-center gap-8 font-mono text-[10px] uppercase tracking-[0.25em] font-medium transition-all duration-700 ease-out ${isHome && !scrolledPastHero ? "opacity-0 -translate-y-4 pointer-events-none" : "opacity-100 translate-y-0"}`}>
         {[
+          { to: "/", l: "Home" },
           { to: "/work", l: "Work" },
           { to: "/studio", l: "Studio" },
           { to: "/process", l: "Process" },
           { to: "/contact", l: "Contact" },
         ].map((i) => (
           <li key={i.to}>
-            <Link to={i.to} className="link-line">
+            <Link to={i.to} className={`relative group transition-colors ${location.pathname === i.to ? "text-[var(--acid)]" : "hover:text-[var(--acid)]"}`}>
               <Scramble>{i.l}</Scramble>
+              <span className={`absolute -bottom-1 left-0 w-full h-[1px] bg-current transition-transform duration-300 origin-left ${location.pathname === i.to ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"}`} />
             </Link>
           </li>
         ))}
@@ -107,8 +109,9 @@ export default function Nav() {
           { to: "/process", l: "Process" },
           { to: "/contact", l: "Contact" },
         ].map((i, idx) => (
-          <Link key={i.to} to={i.to} className="font-display text-5xl text-white hover:text-[var(--acid)] transition-colors" style={{ transitionDelay: menuOpen ? `${idx * 0.05}s` : "0s" }}>
+          <Link key={i.to} to={i.to} className={`relative w-fit font-display text-5xl transition-colors group ${location.pathname === i.to ? "text-[var(--acid)]" : "text-white hover:text-[var(--acid)]"}`} style={{ transitionDelay: menuOpen ? `${idx * 0.05}s` : "0s" }}>
             {i.l}
+            <span className={`absolute -bottom-2 left-0 w-full h-[2px] bg-current transition-transform duration-300 origin-left ${location.pathname === i.to ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"}`} />
           </Link>
         ))}
         <div className="mt-8 border-t border-[var(--bone)]/10 pt-8 flex gap-4">
