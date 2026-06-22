@@ -45,14 +45,15 @@ function DesktopInkCanvas() {
 
     let raf: number;
     const start = performance.now();
+    let lastTime = performance.now();
     let isVisible = true;
+    let currentDpr = Math.min(window.devicePixelRatio || 2, 1.5);
 
     const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 2, 1.5);
       const w = canvas.clientWidth;
       const h = canvas.clientHeight;
-      canvas.width = w * dpr;
-      canvas.height = h * dpr;
+      canvas.width = w * currentDpr;
+      canvas.height = h * currentDpr;
       gl.viewport(0, 0, canvas.width, canvas.height);
       gl.uniform2f(uResLoc, window.innerWidth, window.innerHeight);
     };
@@ -60,20 +61,36 @@ function DesktopInkCanvas() {
     window.addEventListener("resize", resize);
     resize();
 
-    const loop = () => {
-      if (isVisible) {
-        gl.uniform1f(uTimeLoc, (performance.now() - start) * 0.001);
-        gl.drawArrays(gl.TRIANGLES, 0, 6);
-      }
+    const loop = (time: DOMHighResTimeStamp) => {
+      // 👱‍♀️ ponytail: completely pause WebGL render loop when hero is out of view
+      if (!isVisible) return;
       raf = requestAnimationFrame(loop);
+
+      const delta = time - lastTime;
+      // 👱‍♀️ ponytail: Cap at ~60fps to save battery on 120Hz+ screens
+      if (delta < 16) return;
+      lastTime = time - (delta % 16);
+
+      // 👱‍♀️ ponytail: Detect struggling refresh rate (<20fps) and dynamically degrade resolution
+      if (delta > 50 && currentDpr > 1) {
+        currentDpr = 1;
+        resize();
+      }
+
+      gl.uniform1f(uTimeLoc, (time - start) * 0.001);
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
     };
 
     const observer = new IntersectionObserver(([entry]) => {
       isVisible = entry.isIntersecting;
+      if (isVisible) {
+        lastTime = performance.now();
+        raf = requestAnimationFrame(loop);
+      } else {
+        cancelAnimationFrame(raf);
+      }
     });
     observer.observe(canvas);
-
-    raf = requestAnimationFrame(loop);
 
     return () => {
       cancelAnimationFrame(raf);
