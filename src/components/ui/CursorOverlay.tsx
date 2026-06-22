@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
-import { useMediaQuery } from "../hooks/useMediaQuery";
+import { useMediaQuery } from "../../hooks/useMediaQuery";
 
-export function CursorProvider({ children }: { children: React.ReactNode }) {
+export default function CursorOverlay() {
   const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
   const isTouchDevice = useMediaQuery('(hover: none) and (pointer: coarse)');
   const shouldDisable = prefersReducedMotion || isTouchDevice;
@@ -37,7 +37,6 @@ export function CursorProvider({ children }: { children: React.ReactNode }) {
       gx = e.clientX;
       gy = e.clientY;
 
-      // Activate will-change while moving
       if (willChangeTimer) clearTimeout(willChangeTimer);
       setWillChange(true);
       willChangeTimer = setTimeout(() => setWillChange(false), 3000);
@@ -54,15 +53,9 @@ export function CursorProvider({ children }: { children: React.ReactNode }) {
       cx += (gx - cx) * 0.15;
       cy += (gy - cy) * 0.15;
 
-      if (dot.current) {
-        dot.current.style.transform = `translate3d(${mx.x}px, ${mx.y}px, 0) translate(-50%, -50%)`;
-      }
-      if (ring.current) {
-        ring.current.style.transform = `translate3d(${rx.x}px, ${rx.y}px, 0) translate(-50%, -50%)`;
-      }
-      if (glow.current) {
-        glow.current.style.transform = `translate3d(${cx}px, ${cy}px, 0) translate(-50%, -50%)`;
-      }
+      if (dot.current) dot.current.style.transform = `translate3d(${mx.x}px, ${mx.y}px, 0) translate(-50%, -50%)`;
+      if (ring.current) ring.current.style.transform = `translate3d(${rx.x}px, ${rx.y}px, 0) translate(-50%, -50%)`;
+      if (glow.current) glow.current.style.transform = `translate3d(${cx}px, ${cy}px, 0) translate(-50%, -50%)`;
 
       if (Math.abs(mx.x - rx.x) < 0.1 && Math.abs(mx.y - rx.y) < 0.1 && Math.abs(gx - cx) < 0.1 && Math.abs(gy - cy) < 0.1) {
         running = false;
@@ -99,16 +92,13 @@ export function CursorProvider({ children }: { children: React.ReactNode }) {
     };
   }, [shouldDisable]);
 
+  if (shouldDisable) return null;
+
   return (
     <>
-      {!shouldDisable && (
-        <>
-          <div ref={glow} className="cursor-glow hidden md:block" style={{ pointerEvents: "none" }} />
-          <div ref={dot} className="cursor-dot hidden md:block" style={{ pointerEvents: "none" }} />
-          <div ref={ring} className="cursor-ring hidden md:block" style={{ pointerEvents: "none" }} />
-        </>
-      )}
-      {children}
+      <div ref={glow} className="cursor-glow hidden md:block" style={{ pointerEvents: "none" }} />
+      <div ref={dot} className="cursor-dot hidden md:block" style={{ pointerEvents: "none" }} />
+      <div ref={ring} className="cursor-ring hidden md:block" style={{ pointerEvents: "none" }} />
     </>
   );
 }

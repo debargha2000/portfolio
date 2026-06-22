@@ -1,26 +1,27 @@
 import React, { useEffect, useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useParallax, useClipReveal } from "../../hooks/motionUtils";
+import { useParallax, useClipReveal, useReveal } from "../../hooks/motionUtils";
 
-gsap.registerPlugin(ScrollTrigger);
+function prefersReducedMotion(): boolean {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
 
 export const ProjectProgress = React.memo(function ProjectProgress() {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    if (!ref.current) return;
+    if (!ref.current || prefersReducedMotion()) return;
     const main = document.querySelector("main");
     if (!main) return;
-    const st = ScrollTrigger.create({
-      trigger: main,
-      start: "top top",
-      end: "bottom bottom",
-      scrub: true,
-      onUpdate: (self) => {
-        if (ref.current) ref.current.style.transform = `scaleY(${self.progress})`;
-      },
-    });
-    return () => st.kill();
+    
+    let raf = 0;
+    const update = () => {
+      const scrollY = window.scrollY;
+      const height = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = height > 0 ? scrollY / height : 0;
+      if (ref.current) ref.current.style.transform = `scaleY(${progress})`;
+      raf = requestAnimationFrame(update);
+    };
+    raf = requestAnimationFrame(update);
+    return () => cancelAnimationFrame(raf);
   }, []);
   return (
     <div
@@ -43,18 +44,7 @@ export const HeroImage = React.memo(function HeroImage({ src, title }: { src: st
 });
 
 export const CASColumn = React.memo(function CASColumn({ s, i }: { s: { n: string; l: string; t: string }; i: number }) {
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!ref.current) return;
-    gsap.fromTo(
-      ref.current,
-      { opacity: 0, y: 60 },
-      {
-        opacity: 1, y: 0, duration: 1, ease: "expo.out", delay: i * 0.15,
-        scrollTrigger: { trigger: ref.current, start: "top 85%", toggleActions: "play none none reverse" },
-      }
-    );
-  }, [i]);
+  const ref = useReveal<HTMLDivElement>(i * 0.15);
   return (
     <div ref={ref}>
       <div className="font-display italic text-5xl md:text-6xl text-[var(--acid)] mb-4 inline-block hover:rotate-[-10deg] transition-transform duration-500">{s.n}</div>
@@ -65,18 +55,7 @@ export const CASColumn = React.memo(function CASColumn({ s, i }: { s: { n: strin
 });
 
 export const CreditRow = React.memo(function CreditRow({ c, i }: { c: { role: string; name: string }; i: number }) {
-  const ref = useRef<HTMLLIElement>(null);
-  useEffect(() => {
-    if (!ref.current) return;
-    gsap.fromTo(
-      ref.current,
-      { opacity: 0, x: -30 },
-      {
-        opacity: 1, x: 0, duration: 0.8, ease: "expo.out", delay: i * 0.06,
-        scrollTrigger: { trigger: ref.current, start: "top 90%", toggleActions: "play none none reverse" },
-      }
-    );
-  }, [i]);
+  const ref = useReveal<HTMLLIElement>(i * 0.06);
   return (
     <li ref={ref} className="py-4 flex justify-between items-baseline gap-4 group hover:bg-[var(--acid)]/5 transition-colors px-2 -mx-2">
       <span className="text-xs uppercase tracking-widest text-[var(--bone)]/50 group-hover:text-[var(--acid)] transition-colors">{c.role}</span>

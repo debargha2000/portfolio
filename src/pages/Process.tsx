@@ -1,32 +1,31 @@
 import { useEffect, useRef } from "react";
 import { useDocumentMeta } from "../hooks/useDocumentMeta";
 import { Link } from "react-router-dom";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { CharReveal, WordReveal, Magnetic, Scramble } from "../components/motion/Motion";
-import { useParallax, useTilt, useClipReveal } from "../hooks/motionUtils";
+import { useParallax, useTilt, useClipReveal, useReveal } from "../hooks/motionUtils";
 import { processData } from "../data/processData";
-
-gsap.registerPlugin(ScrollTrigger);
 
 function Movement({ m }: { m: any; i: number }) {
   const parallax = useParallax<HTMLDivElement>(0.3);
   const panelRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    if (!panelRef.current) return;
-    gsap.fromTo(
-      panelRef.current.querySelectorAll(".mv-item"),
-      { opacity: 0, x: 40 },
-      {
-        opacity: 1, x: 0, duration: 0.8, ease: "expo.out", stagger: 0.05,
-        scrollTrigger: { trigger: panelRef.current, start: "top 70%", toggleActions: "play none none reverse" },
+    const el = panelRef.current;
+    if (!el) return;
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReducedMotion) return;
+    const obs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        el.classList.add("is-visible");
+        obs.disconnect();
       }
-    );
+    }, { rootMargin: "0px 0px -15% 0px" });
+    obs.observe(el);
+    return () => obs.disconnect();
   }, []);
 
   return (
-    <article ref={panelRef} className="py-20 md:py-32 border-t border-[var(--bone)]/15 grid grid-cols-12 gap-8 relative overflow-hidden group">
+    <article ref={panelRef} className="reveal-group py-20 md:py-32 border-t border-[var(--bone)]/15 grid grid-cols-12 gap-8 relative overflow-hidden group">
       <div
         ref={parallax}
         className="absolute inset-0 opacity-[0.06] group-hover:opacity-[0.15] transition-opacity duration-1000 pointer-events-none"
@@ -34,13 +33,13 @@ function Movement({ m }: { m: any; i: number }) {
       />
 
       <div className="col-span-12 md:col-span-3 relative z-10">
-        <div className="mv-item font-display italic text-8xl md:text-[10rem] text-[var(--acid)] leading-none group-hover:rotate-[-15deg] group-hover:scale-110 transition-all duration-700 inline-block origin-bottom-left">
+        <div className="mv-item reveal-fade font-display italic text-8xl md:text-[10rem] text-[var(--acid)] leading-none group-hover:rotate-[-15deg] group-hover:scale-110 transition-all duration-700 inline-block origin-bottom-left" style={{ transitionDelay: '0s' }}>
           {m.n}
         </div>
-        <div className="mv-item text-xs uppercase tracking-widest text-[var(--bone)]/50 mt-4">{m.dur}</div>
+        <div className="mv-item reveal-fade text-xs uppercase tracking-widest text-[var(--bone)]/50 mt-4" style={{ transitionDelay: '0.05s' }}>{m.dur}</div>
       </div>
       <div className="col-span-12 md:col-span-9 relative z-10">
-        <h2 className="mv-item font-display text-6xl md:text-8xl leading-none tracking-tight mb-8">
+        <h2 className="mv-item reveal-fade font-display text-6xl md:text-8xl leading-none tracking-tight mb-8" style={{ transitionDelay: '0.1s' }}>
           <Scramble>{m.t}</Scramble>
         </h2>
         <WordReveal className="mv-item font-display text-2xl md:text-3xl leading-snug mb-10 max-w-3xl" as="p">
@@ -48,7 +47,7 @@ function Movement({ m }: { m: any; i: number }) {
         </WordReveal>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-10">
-          <div className="mv-item">
+          <div className="mv-item reveal-fade" style={{ transitionDelay: '0.15s' }}>
             <CharReveal as="div" className="text-xs uppercase tracking-widest text-[var(--acid)] mb-3">Outputs</CharReveal>
             <ul className="space-y-2">
               {m.outputs.map((o: string) => (
@@ -59,13 +58,13 @@ function Movement({ m }: { m: any; i: number }) {
               ))}
             </ul>
           </div>
-          <div className="mv-item">
+          <div className="mv-item reveal-fade" style={{ transitionDelay: '0.2s' }}>
             <CharReveal as="div" className="text-xs uppercase tracking-widest text-[var(--acid)] mb-3">Tools</CharReveal>
             <p className="text-[var(--bone)]/80">{m.tools}</p>
           </div>
         </div>
 
-        <blockquote className="mv-item border-l-2 border-[var(--bone)]/30 pl-6 max-w-2xl hover:border-[var(--acid)] transition-colors">
+        <blockquote className="mv-item reveal-fade border-l-2 border-[var(--bone)]/30 pl-6 max-w-2xl hover:border-[var(--acid)] transition-colors" style={{ transitionDelay: '0.25s' }}>
           <WordReveal className="font-display italic text-2xl md:text-3xl leading-tight" as="p">
             {m.quote}
           </WordReveal>
@@ -96,18 +95,7 @@ function PricingCard({ e, i }: { e: { t: string; d: string; from: string; dur: s
 }
 
 function FAQItem({ f, i }: { f: { q: string; a: string }; i: number }) {
-  const ref = useRef<HTMLDetailsElement>(null);
-  useEffect(() => {
-    if (!ref.current) return;
-    gsap.fromTo(
-      ref.current,
-      { opacity: 0, y: 30 },
-      {
-        opacity: 1, y: 0, duration: 0.8, ease: "expo.out", delay: i * 0.08,
-        scrollTrigger: { trigger: ref.current, start: "top 90%", toggleActions: "play none none reverse" },
-      }
-    );
-  }, [i]);
+  const ref = useReveal<HTMLDetailsElement>(i * 0.08);
   return (
     <details ref={ref} className="faq group py-6">
       <summary className="flex justify-between items-baseline gap-4">

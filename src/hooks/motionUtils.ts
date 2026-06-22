@@ -1,8 +1,4 @@
 import { useEffect, useLayoutEffect, useRef, useCallback } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-gsap.registerPlugin(ScrollTrigger);
 
 /* ─── Shared mouse position (single global listener instead of N) ─── */
 const mousePos = { x: 0, y: 0 };
@@ -41,62 +37,52 @@ export function useNumberFlip(target: number, duration = 1.5) {
       ref.current.textContent = String(target);
       return;
     }
-    const st = ScrollTrigger.create({
-      trigger: ref.current,
-      start: "top 85%",
-      onEnter: () => {
-        const startTime = Date.now();
-        const animate = () => {
-          if (!ref.current) return;
-          const elapsed = (Date.now() - startTime) / 1000;
-          const progress = Math.min(elapsed / duration, 1);
+    let raf = 0;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        const startTime = performance.now();
+        const loop = (now: number) => {
+          const progress = Math.min((now - startTime) / (duration * 1000), 1);
           const eased = 1 - Math.pow(1 - progress, 3);
           const current = Math.floor(eased * target);
-          ref.current.textContent = String(current).padStart(String(target).length, "0");
-          if (progress < 1) requestAnimationFrame(animate);
+          if (ref.current) ref.current.textContent = String(current).padStart(String(target).length, "0");
+          if (progress < 1) raf = requestAnimationFrame(loop);
         };
-        animate();
-      },
-      onLeaveBack: () => {
-        if (ref.current) ref.current.textContent = "0";
+        raf = requestAnimationFrame(loop);
+        observer.disconnect();
       }
-    });
-    return () => st.kill();
+    }, { rootMargin: "0px 0px -15% 0px" });
+    observer.observe(ref.current);
+    return () => { observer.disconnect(); cancelAnimationFrame(raf); };
   }, [target, duration]);
   return { ref };
 }
 
-/* ---------- Circle mask reveal ---------- */
+/* ---------- Circle mask reveal (Ponytail CSS Observer) ---------- */
 export function useCircleReveal<T extends HTMLElement>(delay = 0) {
   const ref = useRef<T>(null);
   useLayoutEffect(() => {
-    if (!ref.current) return;
-    if (prefersReducedMotion()) return; // show immediately
-    gsap.set(ref.current, { clipPath: "circle(0% at 50% 50%)" });
-    const st = ScrollTrigger.create({
-      trigger: ref.current,
-      start: "top 85%",
-      onEnter: () => {
-        gsap.to(ref.current, {
-          clipPath: "circle(150% at 50% 50%)",
-          duration: 1.6,
-          ease: "expo.out",
-          delay,
-        });
-      },
-      onLeaveBack: () => {
-        gsap.set(ref.current, { clipPath: "circle(0% at 50% 50%)" });
+    const el = ref.current;
+    if (!el) return;
+    if (prefersReducedMotion()) return;
+    
+    el.classList.add("reveal-circle");
+    if (delay) el.style.transitionDelay = `${delay}s`;
+
+    const obs = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) {
+        el.classList.add("is-visible");
+        obs.disconnect();
       }
-    });
-    return () => st.kill();
+    }, { rootMargin: "0px 0px -15% 0px" });
+    
+    obs.observe(el);
+    return () => obs.disconnect();
   }, [delay]);
   return ref;
 }
 
-
-
 /* ---------- Magnetic ---------- */
-// Uses shared mouse position instead of individual listeners.
 export function useMagnetic<T extends HTMLElement>(strength = 0.175) {
   const ref = useRef<T>(null);
   const mouse = useSharedMouse();
@@ -104,7 +90,6 @@ export function useMagnetic<T extends HTMLElement>(strength = 0.175) {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    // Skip on touch devices or reduced motion
     if (prefersReducedMotion() || window.matchMedia("(hover: none)").matches) return;
 
     let raf = 0;
@@ -114,7 +99,6 @@ export function useMagnetic<T extends HTMLElement>(strength = 0.175) {
     let lastScroll = window.scrollY;
     let isVisible = false;
 
-    // Only activate when visible
     const observer = new IntersectionObserver(([entry]) => {
       isVisible = entry.isIntersecting;
       if (!isVisible) {
@@ -127,7 +111,6 @@ export function useMagnetic<T extends HTMLElement>(strength = 0.175) {
 
     const loop = () => {
       if (!isVisible) { running = false; return; }
-
       if (!rect || Math.abs(window.scrollY - lastScroll) > 10) {
         rect = el.getBoundingClientRect();
         lastScroll = window.scrollY;
@@ -153,7 +136,6 @@ export function useMagnetic<T extends HTMLElement>(strength = 0.175) {
       raf = requestAnimationFrame(loop);
     };
 
-    // Start loop only when mouse moves while element is visible
     const checkInterval = setInterval(() => {
       if (isVisible && !running) {
         running = true;
@@ -234,31 +216,30 @@ export function useCountUp(target: number, duration = 1.6, decimals = 0, start =
       ref.current.textContent = prefix + Number(target.toFixed(decimals)).toLocaleString() + suffix;
       return;
     }
-    const obj = { v: start };
-    const st = ScrollTrigger.create({
-      trigger: ref.current,
-      start: "top 85%",
-      onEnter: () => {
-        gsap.to(obj, {
-          v: target,
-          duration,
-          ease: "power2.out",
-          onUpdate: () => {
-            if (ref.current) {
-              ref.current.textContent = prefix + Number(obj.v.toFixed(decimals)).toLocaleString() + suffix;
-            }
-          },
-        });
-      },
-      onLeaveBack: () => {
-        gsap.killTweensOf(obj);
-        obj.v = start;
-        if (ref.current) {
-          ref.current.textContent = prefix + Number(start.toFixed(decimals)).toLocaleString() + suffix;
-        }
+
+    let raf = 0;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        const startTime = performance.now();
+        const loop = (now: number) => {
+          const progress = Math.min((now - startTime) / (duration * 1000), 1);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          const current = start + (target - start) * eased;
+          if (ref.current) {
+            ref.current.textContent = prefix + Number(current.toFixed(decimals)).toLocaleString() + suffix;
+          }
+          if (progress < 1) raf = requestAnimationFrame(loop);
+        };
+        raf = requestAnimationFrame(loop);
+        observer.disconnect();
       }
-    });
-    return () => st.kill();
+    }, { rootMargin: "0px 0px -15% 0px" });
+
+    observer.observe(ref.current);
+    return () => {
+      observer.disconnect();
+      cancelAnimationFrame(raf);
+    };
   }, [target, duration, decimals, start, prefix, suffix]);
   return { ref };
 }
@@ -319,62 +300,53 @@ export function useScramble() {
   return { scramble, reset };
 }
 
-
-
-/* ---------- Reveal on scroll (fade + y) ---------- */
+/* ---------- Reveal on scroll (fade + y) (Ponytail CSS Observer) ---------- */
 export function useReveal<T extends HTMLElement>(delay = 0) {
   const ref = useRef<T>(null);
   useEffect(() => {
-    if (!ref.current) return;
-    if (prefersReducedMotion()) return; // show immediately
-    const st = ScrollTrigger.create({
-      trigger: ref.current,
-      start: "top 88%",
-      onEnter: () => {
-        gsap.fromTo(
-          ref.current,
-          { opacity: 0, y: 60 },
-          { opacity: 1, y: 0, duration: 1.1, ease: "expo.out", delay }
-        );
-      },
-      onLeaveBack: () => {
-        gsap.set(ref.current, { opacity: 0, y: 60 });
+    const el = ref.current;
+    if (!el) return;
+    if (prefersReducedMotion()) return;
+    
+    el.classList.add("reveal-fade");
+    if (delay) el.style.transitionDelay = `${delay}s`;
+
+    const obs = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) {
+        el.classList.add("is-visible");
+        obs.disconnect();
       }
-    });
-    return () => st.kill();
+    }, { rootMargin: "0px 0px -12% 0px" });
+    
+    obs.observe(el);
+    return () => obs.disconnect();
   }, [delay]);
   return ref;
 }
 
-/* ---------- Clip-path reveal ---------- */
+/* ---------- Clip-path reveal (Ponytail CSS Observer) ---------- */
 export function useClipReveal<T extends HTMLElement>(variant: "circle" | "h" | "v" = "h", delay = 0) {
   const ref = useRef<T>(null);
   useLayoutEffect(() => {
-    if (!ref.current) return;
-    if (prefersReducedMotion()) return; // show immediately
-    const initial =
-      variant === "circle"
-        ? "circle(0% at 50% 50%)"
-        : variant === "h"
-        ? "inset(0 100% 0 0)"
-        : "inset(100% 0 0 0)";
-    gsap.set(ref.current, { clipPath: initial });
-    const st = ScrollTrigger.create({
-      trigger: ref.current,
-      start: "top 85%",
-      onEnter: () => {
-        gsap.to(ref.current, {
-          clipPath: "inset(0 0 0 0)",
-          duration: 1.4,
-          ease: "expo.inOut",
-          delay,
-        });
-      },
-      onLeaveBack: () => {
-        gsap.set(ref.current, { clipPath: initial });
+    const el = ref.current;
+    if (!el) return;
+    if (prefersReducedMotion()) return;
+    
+    if (variant === "circle") el.classList.add("reveal-circle");
+    else if (variant === "h") el.classList.add("reveal-clip-h");
+    else el.classList.add("reveal-clip-v");
+    
+    if (delay) el.style.transitionDelay = `${delay}s`;
+
+    const obs = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) {
+        el.classList.add("is-visible");
+        obs.disconnect();
       }
-    });
-    return () => st.kill();
+    }, { rootMargin: "0px 0px -15% 0px" });
+    
+    obs.observe(el);
+    return () => obs.disconnect();
   }, [variant, delay]);
   return ref;
 }
@@ -383,20 +355,20 @@ export function useClipReveal<T extends HTMLElement>(variant: "circle" | "h" | "
 export function useParallax<T extends HTMLElement>(speed = 0.2) {
   const ref = useRef<T>(null);
   useEffect(() => {
-    if (!ref.current) return;
-    if (prefersReducedMotion()) return;
     const el = ref.current;
-    const st = ScrollTrigger.create({
-      trigger: el,
-      start: "top bottom",
-      end: "bottom top",
-      scrub: true,
-      onUpdate: (self) => {
-        const y = (self.progress - 0.5) * speed * 400;
-        el.style.transform = `translate3d(0, ${y}px, 0)`;
-      },
-    });
-    return () => st.kill();
+    if (!el || prefersReducedMotion()) return;
+    let raf = 0;
+    const update = () => {
+      const rect = el.getBoundingClientRect();
+      const centerY = rect.top + rect.height / 2;
+      const windowCenter = window.innerHeight / 2;
+      const distance = centerY - windowCenter;
+      const y = distance * speed;
+      el.style.transform = `translate3d(0, ${y}px, 0)`;
+      raf = requestAnimationFrame(update);
+    };
+    raf = requestAnimationFrame(update);
+    return () => cancelAnimationFrame(raf);
   }, [speed]);
   return ref;
 }
@@ -405,31 +377,26 @@ export function useParallax<T extends HTMLElement>(speed = 0.2) {
 export function useScrollSkew<T extends HTMLElement>(max = 8) {
   const ref = useRef<T>(null);
   useEffect(() => {
-    if (!ref.current) return;
-    if (prefersReducedMotion()) return;
     const el = ref.current;
+    if (!el || prefersReducedMotion()) return;
     
-    let proxy = { skew: 0 };
-    let setter = gsap.quickSetter(el, "skewY", "deg");
-    let clamp = gsap.utils.clamp(-max, max);
+    let raf = 0;
+    let lastScroll = window.scrollY;
+    let skew = 0;
     
-    const st = ScrollTrigger.create({
-      onUpdate: (self) => {
-        let skew = clamp(self.getVelocity() / -150);
-        if (Math.abs(skew) > Math.abs(proxy.skew)) {
-          proxy.skew = skew;
-          gsap.to(proxy, {
-            skew: 0,
-            duration: 0.8,
-            ease: "power3.out",
-            overwrite: true,
-            onUpdate: () => setter(proxy.skew)
-          });
-        }
-      }
-    });
-    
-    return () => st.kill();
+    const update = () => {
+      const scroll = window.scrollY;
+      const velocity = scroll - lastScroll;
+      lastScroll = scroll;
+      
+      const targetSkew = Math.max(-max, Math.min(max, velocity * -0.05));
+      skew += (targetSkew - skew) * 0.1;
+      
+      el.style.transform = `skewY(${skew}deg)`;
+      raf = requestAnimationFrame(update);
+    };
+    raf = requestAnimationFrame(update);
+    return () => cancelAnimationFrame(raf);
   }, [max]);
   return ref;
 }

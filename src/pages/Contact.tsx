@@ -1,11 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useDocumentMeta } from "../hooks/useDocumentMeta";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { CharReveal, WordReveal, Magnetic, Scramble } from "../components/motion/Motion";
-import { useClipReveal } from "../hooks/motionUtils";
-
-gsap.registerPlugin(ScrollTrigger);
+import { useClipReveal, useReveal } from "../hooks/motionUtils";
 
 export default function Contact() {
   const [form, setForm] = useState({
@@ -228,18 +224,7 @@ function SidebarBlock({ label, content, extra }: { label: string; content: React
 }
 
 function FAQCard({ f, i }: { f: { q: string; a: string }; i: number }) {
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!ref.current) return;
-    gsap.fromTo(
-      ref.current,
-      { opacity: 0, y: 40 },
-      {
-        opacity: 1, y: 0, duration: 0.9, ease: "expo.out", delay: i * 0.1,
-        scrollTrigger: { trigger: ref.current, start: "top 90%", toggleActions: "play none none reverse" },
-      }
-    );
-  }, [i]);
+  const ref = useReveal<HTMLDivElement>(i * 0.1);
   return (
     <div ref={ref} className="border-t border-[var(--bone)]/15 pt-6 group hover:border-[var(--acid)] transition-colors">
       <h4 className="font-display text-2xl md:text-3xl mb-3 group-hover:text-[var(--acid)] transition-colors">

@@ -1,15 +1,14 @@
 export const vertexShader = `
-  varying vec2 vUv;
+  attribute vec2 position;
   void main() {
-    vUv = uv;
-    gl_Position = vec4(position, 1.0);
+    gl_Position = vec4(position, 0.0, 1.0);
   }
 `;
 
 export const fragmentShader = `
+  precision highp float;
   uniform float uTime;
   uniform vec2 uResolution;
-  varying vec2 vUv;
 
   // Hash function
   float hash(vec2 p) {

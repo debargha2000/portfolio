@@ -1,37 +1,15 @@
-import { useState, useMemo, useEffect, useRef, lazy, Suspense, memo } from "react";
+import { useState, useMemo, lazy, Suspense, memo } from "react";
 import { useDocumentMeta } from "../hooks/useDocumentMeta";
 import { Link } from "react-router-dom";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { PROJECTS } from "../data/projects";
 import { CharReveal, WordReveal, Magnetic, Scramble } from "../components/motion/Motion";
-import { useMagnetic } from "../hooks/motionUtils";
-
-gsap.registerPlugin(ScrollTrigger);
+import { useMagnetic, useReveal } from "../hooks/motionUtils";
 
 const ProjectImage = lazy(() => import("../components/work/ProjectImage"));
 
 const ProjectCard = memo(function ProjectCard({ p, i }: { p: typeof PROJECTS[number]; i: number }) {
-  const card = useRef<HTMLAnchorElement>(null);
   const [hovered, setHovered] = useState(false);
-
-  useEffect(() => {
-    if (!card.current) return;
-    const el = card.current;
-    gsap.fromTo(
-      el,
-      { opacity: 0, y: 80, rotateX: -8 },
-      {
-        opacity: 1,
-        y: 0,
-        rotateX: 0,
-        duration: 1.1,
-        ease: "expo.out",
-        delay: (i % 3) * 0.1,
-        scrollTrigger: { trigger: el, start: "top 90%", toggleActions: "play none none reverse" },
-      }
-    );
-  }, [i]);
+  const card = useReveal<HTMLAnchorElement>((i % 3) * 0.1);
 
   return (
     <Link

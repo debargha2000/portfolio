@@ -1,17 +1,13 @@
 import { useEffect } from "react";
 import { useDocumentMeta } from "../hooks/useDocumentMeta";
 import { useParams, Link } from "react-router-dom";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { getProject, getNextProject, getPrevProject } from "../data/projects";
 import { CharReveal, WordReveal } from "../components/motion/Motion";
-
-gsap.registerPlugin(ScrollTrigger);
 
 import React, { useRef } from "react";
 import { type CaseBlock } from "../data/projects";
 import { Counter } from "../components/motion/Motion";
-import { useParallax, useClipReveal } from "../hooks/motionUtils";
+import { useParallax, useClipReveal, useReveal } from "../hooks/motionUtils";
 
 const FullBleed = React.memo(function FullBleed({ b }: { b: CaseBlock }) {
   const parallax = useParallax<HTMLElement>(0.15);
@@ -63,38 +59,20 @@ const ImgPair = React.memo(function ImgPair({ b }: { b: CaseBlock }) {
 });
 
 const QuoteBlock = React.memo(function QuoteBlock({ b }: { b: CaseBlock }) {
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!ref.current || !b.text) return;
-    const chars = ref.current.querySelectorAll<HTMLSpanElement>(".qb-c");
-    gsap.set(chars, { opacity: 0, y: 20, rotateZ: () => gsap.utils.random(-3, 3) });
-    ScrollTrigger.create({
-      trigger: ref.current,
-      start: "top 85%",
-      onEnter: () => {
-        gsap.to(chars, {
-          opacity: 1, y: 0, rotateZ: 0,
-          duration: 0.6, ease: "power2.out", stagger: 0.01,
-        });
-      },
-      onLeaveBack: () => {
-        gsap.set(chars, { opacity: 0, y: 20, rotateZ: () => gsap.utils.random(-3, 3) });
-      }
-    });
-  }, [b.text]);
+  const ref = useReveal<HTMLDivElement>();
 
   return (
-    <div ref={ref} className="my-20 md:my-32 border-l-2 border-[var(--acid)] pl-6 md:pl-10">
+    <div ref={ref} className="reveal-group my-20 md:my-32 border-l-2 border-[var(--acid)] pl-6 md:pl-10">
       <p className="font-display italic text-3xl md:text-5xl leading-tight mb-4">
         "
         {b.text?.split("").map((ch: any, idx: number) => (
-          <span key={idx} className="qb-c inline-block">
+          <span key={idx} className="qb-c reveal-fade inline-block" style={{ transitionDelay: `${idx * 0.01}s` }}>
             {ch === " " ? "\u00A0" : ch}
           </span>
         ))}
         "
       </p>
-      {b.caption && <div className="text-xs uppercase tracking-widest text-[var(--bone)]/60">{b.caption}</div>}
+      {b.caption && <div className="text-xs uppercase tracking-widest text-[var(--bone)]/60 reveal-fade" style={{ transitionDelay: '0.5s' }}>{b.caption}</div>}
     </div>
   );
 });
@@ -153,7 +131,7 @@ export default function ProjectDetail() {
   const prev = slug ? getPrevProject(slug) : null;
 
   useEffect(() => {
-    ScrollTrigger.refresh();
+    window.scrollTo(0, 0);
   }, [slug]);
 
   if (!p) {

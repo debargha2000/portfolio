@@ -1,9 +1,9 @@
 import { useEffect, useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useMagnetic, useScramble, useCountUp } from "../../hooks/motionUtils";
 
-gsap.registerPlugin(ScrollTrigger);
+function prefersReducedMotion(): boolean {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
 
 /* --- Character-by-character reveal --- */
 export function CharReveal({
@@ -19,41 +19,31 @@ export function CharReveal({
 }) {
   const ref = useRef<HTMLElement>(null);
   useEffect(() => {
-    if (!ref.current) return;
-    const chars = ref.current.querySelectorAll<HTMLSpanElement>(".c");
-    gsap.set(chars, { yPercent: 115, opacity: 0 });
-    ScrollTrigger.create({
-      trigger: ref.current,
-      start: "top 88%",
-      onEnter: () => {
-        gsap.to(chars, {
-          yPercent: 0,
-          opacity: 1,
-          duration: 0.8,
-          ease: "expo.out",
-          stagger,
-        });
-      },
-      onLeaveBack: () => {
-        gsap.set(chars, { yPercent: 115, opacity: 0 });
+    const el = ref.current;
+    if (!el || prefersReducedMotion()) return;
+    const obs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        el.classList.add("is-visible");
+        obs.disconnect();
       }
-    });
-  }, [stagger]);
+    }, { rootMargin: "0px 0px -12% 0px" });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
 
-  // Split string but keep spaces as spaces between inline blocks
   const nodes = children.split("").map((ch, i) =>
     ch === " " ? (
       <span key={i} style={{ display: "inline-block", width: "0.3em" }}>
         &nbsp;
       </span>
     ) : (
-      <span key={i} className="c inline-block">{ch}</span>
+      <span key={i} className="c inline-block reveal-fade" style={{ transitionDelay: `${i * stagger}s` }}>{ch}</span>
     )
   );
 
   const TagAny = Tag as any;
   return (
-    <TagAny ref={ref} className={className} aria-label={children}>
+    <TagAny ref={ref} className={`${className} reveal-group`} aria-label={children}>
       {nodes}
     </TagAny>
   );
@@ -71,37 +61,29 @@ export function WordReveal({
 }) {
   const ref = useRef<HTMLElement>(null);
   useEffect(() => {
-    if (!ref.current) return;
-    const words = ref.current.querySelectorAll<HTMLSpanElement>(".w > span");
-    gsap.set(words, { yPercent: 115 });
-    ScrollTrigger.create({
-      trigger: ref.current,
-      start: "top 85%",
-      onEnter: () => {
-        gsap.to(words, {
-          yPercent: 0,
-          duration: 1,
-          ease: "expo.out",
-          stagger: 0.04,
-        });
-      },
-      onLeaveBack: () => {
-        gsap.set(words, { yPercent: 115 });
+    const el = ref.current;
+    if (!el || prefersReducedMotion()) return;
+    const obs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        el.classList.add("is-visible");
+        obs.disconnect();
       }
-    });
+    }, { rootMargin: "0px 0px -12% 0px" });
+    obs.observe(el);
+    return () => obs.disconnect();
   }, []);
 
   const nodes = children.split(" ").map((w, i) => {
     const isMoriarty = w.replace(/[^a-zA-Z]/g, '') === "Moriarty" || w.replace(/[^a-zA-Z]/g, '') === "Moriatry";
     return (
-    <span key={i} className="w inline-block overflow-hidden align-bottom mr-[0.25em]">
-      <span className={`inline-block ${isMoriarty ? "text-[var(--orange)]" : ""}`}>{w.replace("Moriatry", "Moriarty")}</span>
-    </span>
+      <span key={i} className="w inline-block mr-[0.25em] reveal-fade" style={{ transitionDelay: `${i * 0.04}s` }}>
+        <span className={`inline-block ${isMoriarty ? "text-[var(--orange)]" : ""}`}>{w.replace("Moriatry", "Moriarty")}</span>
+      </span>
     );
   });
 
   const TagAny = Tag as any;
-  return <TagAny ref={ref} className={className}>{nodes}</TagAny>;
+  return <TagAny ref={ref} className={`${className} reveal-group`}>{nodes}</TagAny>;
 }
 
 /* --- Counter with count-up on scroll --- */

@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import gsap from "gsap";
 import { Magnetic } from "../../components/motion/Motion";
 import { useNumberFlip } from "../../hooks/motionUtils";
 
@@ -20,19 +19,18 @@ export default function StudioTease() {
   const bioRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!bioRef.current) return;
-    const words = bioRef.current.querySelectorAll<HTMLSpanElement>(".word");
-    gsap.fromTo(
-      words,
-      { yPercent: 120 },
-      {
-        yPercent: 0,
-        duration: 0.9,
-        ease: "expo.out",
-        stagger: 0.03,
-        scrollTrigger: { trigger: bioRef.current, start: "top 75%", toggleActions: "play none none reverse" },
+    const el = bioRef.current;
+    if (!el) return;
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReducedMotion) return;
+    const obs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        el.classList.add("is-visible");
+        obs.disconnect();
       }
-    );
+    }, { rootMargin: "0px 0px -15% 0px" });
+    obs.observe(el);
+    return () => obs.disconnect();
   }, []);
 
   const bio = "We are a small, senior studio — six people, one room in Berlin, one kiln in the basement. Every project is led by a partner, every line of code is written in-house.";
@@ -45,10 +43,10 @@ export default function StudioTease() {
           <Magnetic><Link to="/studio" className="chip shine"><span className="label">More about us ↗</span></Link></Magnetic>
         </div>
         <div className="col-span-12 md:col-span-9">
-          <h3 ref={bioRef} className="font-display display-light text-[7vw] md:text-[3.5vw] leading-[1.1] tracking-[-0.03em]">
+          <h3 ref={bioRef} className="reveal-group font-display display-light text-[7vw] md:text-[3.5vw] leading-[1.1] tracking-[-0.03em]">
             {bio.split(" ").map((w, i) => (
               <span key={i} className="inline-block overflow-hidden mr-[0.22em] align-bottom">
-                <span className={`word inline-block ${[4, 8, 14, 21, 26].includes(i) ? "font-editorial italic" : ""}`}>
+                <span className={`reveal-fade inline-block ${[4, 8, 14, 21, 26].includes(i) ? "font-editorial italic" : ""}`} style={{ transitionDelay: `${i * 0.03}s` }}>
                   {w}
                 </span>
               </span>

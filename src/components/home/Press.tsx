@@ -1,36 +1,17 @@
-import React, { useEffect, useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import React from "react";
 import { Magnetic } from "../../components/motion/Motion";
-import { useCircleReveal } from "../../hooks/motionUtils";
+import { useCircleReveal, useReveal } from "../../hooks/motionUtils";
 
 const PressQuote = React.memo(function PressQuote({ q, i }: { q: { q: string; a: string; y: string }; i: number }) {
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useReveal<HTMLDivElement>();
   const circle = useCircleReveal<HTMLDivElement>(i * 0.1);
-  useEffect(() => {
-    if (!ref.current) return;
-    const chars = ref.current.querySelectorAll<HTMLSpanElement>(".pq-c");
-    gsap.set(chars, { opacity: 0, y: 10 });
-    ScrollTrigger.create({
-      trigger: ref.current,
-      start: "top 85%",
-      onEnter: () => {
-        gsap.to(chars, {
-          opacity: 1, y: 0, duration: 0.4, ease: "power2.out", stagger: 0.008 + i * 0.002,
-        });
-      },
-      onLeaveBack: () => {
-        gsap.set(chars, { opacity: 0, y: 10 });
-      }
-    });
-  }, [i]);
 
   return (
-    <figure ref={(n) => { (ref as any).current = n; (circle as any).current = n; }} className="border-t border-[var(--bone)]/15 pt-6 group">
+    <figure ref={(n) => { (ref as any).current = n; (circle as any).current = n; }} className="reveal-group border-t border-[var(--bone)]/15 pt-6 group">
       <blockquote className="font-editorial italic text-3xl md:text-4xl leading-[1.15] mb-6 group-hover:text-[var(--acid)] transition-colors duration-500">
         "
         {q.q.split("").map((ch, idx) => (
-          <span key={idx} className="pq-c inline-block">
+          <span key={idx} className="pq-c reveal-fade inline-block" style={{ transitionDelay: `${idx * 0.008 + i * 0.002}s` }}>
             {ch === " " ? "\u00A0" : ch}
           </span>
         ))}

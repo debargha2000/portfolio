@@ -3,7 +3,7 @@
   src: url('/fonts/Fraunces-Variable.woff2') format('woff2-variations');
   font-weight: 100 900;
   font-style: normal;
-  font-display: optional;
+  font-display: swap;
   font-stretch: 75% 125%;
 }
 
@@ -12,7 +12,7 @@
   src: url('/fonts/Fraunces-Variable-Italic.woff2') format('woff2-variations');
   font-weight: 100 900;
   font-style: italic;
-  font-display: optional;
+  font-display: swap;
   font-stretch: 75% 125%;
 }
 
@@ -21,7 +21,7 @@
   src: url('/fonts/InstrumentSerif-Regular.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
-  font-display: optional;
+  font-display: swap;
 }
 
 @font-face {
@@ -29,7 +29,7 @@
   src: url('/fonts/InstrumentSerif-Italic.woff2') format('woff2');
   font-weight: 400;
   font-style: italic;
-  font-display: optional;
+  font-display: swap;
 }
 
 @font-face {
@@ -37,7 +37,7 @@
   src: url('/fonts/InterTight-Variable.woff2') format('woff2-variations');
   font-weight: 300 700;
   font-style: normal;
-  font-display: optional;
+  font-display: swap;
 }
 
 @font-face {
@@ -45,7 +45,7 @@
   src: url('/fonts/JetBrainsMono-Regular.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
-  font-display: optional;
+  font-display: swap;
 }
 
 @font-face {
@@ -53,7 +53,7 @@
   src: url('/fonts/JetBrainsMono-Medium.woff2') format('woff2');
   font-weight: 500;
   font-style: normal;
-  font-display: optional;
+  font-display: swap;
 }
 
 .font-display {

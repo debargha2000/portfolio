@@ -1,16 +1,18 @@
 import { useEffect, useRef, memo } from "react";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
 
-/* ─── GLSL shaders (only used on desktop) ─── */
-const vert = /* glsl */ `
+/* ─── GLSL shaders ─── */
+const vert = `
+  attribute vec2 position;
   varying vec2 vUv;
   void main() {
-    vUv = uv;
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    vUv = position * 0.5 + 0.5;
+    gl_Position = vec4(position, 0.0, 1.0);
   }
 `;
 
-const frag = /* glsl */ `
+const frag = `
+  precision highp float;
   uniform sampler2D uTexture;
   uniform float uHover;
   uniform float uTime;
@@ -29,8 +31,6 @@ const frag = /* glsl */ `
 
   void main() {
     vec2 uv = coverUv(vUv, uImgRes, uRes);
-
-    // displacement wave on hover
     float wave = sin((uv.y + uTime * 0.3) * 12.0) * 0.5 + 0.5;
     float disp = uHover * 0.03 * wave;
 
@@ -41,14 +41,11 @@ const frag = /* glsl */ `
     float r = texture2D(uTexture, uvR).r;
     float g = texture2D(uTexture, uvG).g;
     float b = texture2D(uTexture, uvB).b;
-
     vec3 col = vec3(r, g, b);
 
-    // desaturate slightly when idle
     float gray = dot(col, vec3(0.299, 0.587, 0.114));
     col = mix(vec3(gray), col, 0.55 + uHover * 0.45);
 
-    // vignette
     float vig = smoothstep(1.1, 0.35, length(vUv - 0.5));
     col *= mix(0.85, 1.0, vig);
 
@@ -74,7 +71,7 @@ const MobileProjectImage = memo(function MobileProjectImage({ src, active }: { s
   );
 });
 
-/* ─── Desktop-only: WebGL shader image ─── */
+/* ─── Desktop-only: Vanilla WebGL shader image ─── */
 const WebGLProjectImage = memo(function WebGLProjectImage({ src, active }: { src: string; active: boolean }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -86,97 +83,104 @@ const WebGLProjectImage = memo(function WebGLProjectImage({ src, active }: { src
   }, [active]);
 
   useEffect(() => {
-    // Dynamic import to avoid pulling Three.js into the main bundle
-    import("three").then((THREE) => {
-      const container = containerRef.current!;
-      const canvas = canvasRef.current!;
-      if (!container || !canvas) return;
+    const container = containerRef.current!;
+    const canvas = canvasRef.current!;
+    if (!container || !canvas) return;
 
-      const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true });
-      const scene = new THREE.Scene();
-      const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    const gl = canvas.getContext("webgl", { antialias: false, alpha: true });
+    if (!gl) return;
 
-      const uniforms = {
-        uTexture: { value: null as any },
-        uHover: { value: 0 },
-        uTime: { value: 0 },
-        uRes: { value: new THREE.Vector2(1, 1) },
-        uImgRes: { value: new THREE.Vector2(1, 1) },
-      };
+    const compile = (type: number, source: string) => {
+      const shader = gl.createShader(type)!;
+      gl.shaderSource(shader, source);
+      gl.compileShader(shader);
+      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        console.error("Shader error:", gl.getShaderInfoLog(shader));
+      }
+      return shader;
+    };
 
-      const setSize = () => {
-        const w = container.clientWidth;
-        const h = container.clientHeight;
-        renderer.setSize(w, h, false);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
-        uniforms.uRes.value.set(w, h);
-      };
+    const program = gl.createProgram()!;
+    gl.attachShader(program, compile(gl.VERTEX_SHADER, vert));
+    gl.attachShader(program, compile(gl.FRAGMENT_SHADER, frag));
+    gl.linkProgram(program);
+    gl.useProgram(program);
 
-      const tex = new THREE.TextureLoader().load(src, (t: any) => {
-        const img = t.image as HTMLImageElement;
-        uniforms.uImgRes.value.set(img.naturalWidth, img.naturalHeight);
-      });
-      tex.minFilter = THREE.LinearFilter;
-      tex.generateMipmaps = false;
-      uniforms.uTexture.value = tex;
+    const buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, -1,1, 1,-1, 1,1]), gl.STATIC_DRAW);
 
-      const geo = new THREE.PlaneGeometry(2, 2);
-      const mat = new THREE.ShaderMaterial({
-        vertexShader: vert,
-        fragmentShader: frag,
-        uniforms,
-      });
-      const mesh = new THREE.Mesh(geo, mat);
-      scene.add(mesh);
+    const posLoc = gl.getAttribLocation(program, "position");
+    gl.enableVertexAttribArray(posLoc);
+    gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
 
-      setSize();
-      window.addEventListener("resize", setSize);
+    const uHoverLoc = gl.getUniformLocation(program, "uHover");
+    const uTimeLoc = gl.getUniformLocation(program, "uTime");
+    const uResLoc = gl.getUniformLocation(program, "uRes");
+    const uImgResLoc = gl.getUniformLocation(program, "uImgRes");
 
-      const clock = new THREE.Clock();
-      let raf = 0;
-      let isVisible = false;
+    const texture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0,0,0,0]));
 
-      const loop = () => {
-        if (!isVisible) return;
-        uniforms.uTime.value = clock.getElapsedTime();
-        hoverRef.current += (targetRef.current - hoverRef.current) * 0.08;
-        uniforms.uHover.value = hoverRef.current;
-        renderer.render(scene, camera);
-        raf = requestAnimationFrame(loop);
-      };
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = src;
+    img.onload = () => {
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.uniform2f(uImgResLoc, img.naturalWidth, img.naturalHeight);
+    };
 
-      // Only render when visible — prevents GPU waste
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          isVisible = entry.isIntersecting;
-          if (isVisible) {
-            cancelAnimationFrame(raf);
-            raf = requestAnimationFrame(loop);
-          } else {
-            cancelAnimationFrame(raf);
-          }
-        });
-      }, { threshold: 0, rootMargin: "200px" });
+    const setSize = () => {
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.uniform2f(uResLoc, w, h);
+    };
+    setSize();
+    window.addEventListener("resize", setSize);
 
-      observer.observe(container);
+    let raf = 0;
+    let isVisible = false;
+    const start = performance.now();
 
-      return () => {
-        observer.disconnect();
+    const loop = () => {
+      if (!isVisible) return;
+      gl.uniform1f(uTimeLoc, (performance.now() - start) * 0.001);
+      hoverRef.current += (targetRef.current - hoverRef.current) * 0.08;
+      gl.uniform1f(uHoverLoc, hoverRef.current);
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+      raf = requestAnimationFrame(loop);
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      isVisible = entries[0].isIntersecting;
+      if (isVisible) {
         cancelAnimationFrame(raf);
-        window.removeEventListener("resize", setSize);
-        renderer.dispose();
-        geo.dispose();
-        mat.dispose();
-        tex.dispose();
-      };
-    });
+        raf = requestAnimationFrame(loop);
+      }
+    }, { rootMargin: "200px" });
+    observer.observe(container);
+
+    return () => {
+      observer.disconnect();
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", setSize);
+      gl.deleteProgram(program);
+      gl.deleteTexture(texture);
+    };
   }, [src]);
 
   return (
-    <div
-      ref={containerRef}
-      className="absolute inset-0 w-full h-full"
-    >
+    <div ref={containerRef} className="absolute inset-0 w-full h-full">
       <canvas ref={canvasRef} className="w-full h-full block" />
     </div>
   );
