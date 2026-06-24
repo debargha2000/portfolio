@@ -4,10 +4,12 @@ import Nav from "./Nav";
 import Footer from "./Footer";
 import PageTransition from "./PageTransition";
 import { routeConfig } from "../../routes/routeConfig";
+import { SkipLink } from "../ui/SkipLink";
 
 export function Layout() {
   return (
     <>
+      <SkipLink />
       <Nav />
       <div className="grain" />
       <PageTransition />

@@ -14,19 +14,22 @@ export function CharReveal({
 }: {
   children: string;
   className?: string;
-  as?: "span" | "div" | "h1" | "h2" | "h3" | "p";
+  as?: keyof HTMLElementTagNameMap;
   stagger?: number;
 }) {
   const ref = useRef<HTMLElement>(null);
   useEffect(() => {
     const el = ref.current;
     if (!el || prefersReducedMotion()) return;
-    const obs = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        el.classList.add("is-visible");
-        obs.disconnect();
-      }
-    }, { rootMargin: "0px 0px -12% 0px" });
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.classList.add("is-visible");
+          obs.disconnect();
+        }
+      },
+      { rootMargin: "0px 0px -12% 0px" }
+    );
     obs.observe(el);
     return () => obs.disconnect();
   }, []);
@@ -37,15 +40,21 @@ export function CharReveal({
         &nbsp;
       </span>
     ) : (
-      <span key={i} className="c inline-block reveal-fade" style={{ transitionDelay: `${i * stagger}s` }}>{ch}</span>
+      <span
+        key={i}
+        className="c inline-block reveal-fade"
+        style={{ transitionDelay: `${i * stagger}s` }}
+      >
+        {ch}
+      </span>
     )
   );
 
-  const TagAny = Tag as any;
+  const Component = Tag as React.ElementType;
   return (
-    <TagAny ref={ref} className={`${className} reveal-group`} aria-label={children}>
+    <Component ref={ref} className={`${className} reveal-group`} aria-label={children}>
       {nodes}
-    </TagAny>
+    </Component>
   );
 }
 
@@ -57,33 +66,47 @@ export function WordReveal({
 }: {
   children: string;
   className?: string;
-  as?: "span" | "div" | "h1" | "h2" | "h3" | "p";
+  as?: keyof HTMLElementTagNameMap;
 }) {
   const ref = useRef<HTMLElement>(null);
   useEffect(() => {
     const el = ref.current;
     if (!el || prefersReducedMotion()) return;
-    const obs = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        el.classList.add("is-visible");
-        obs.disconnect();
-      }
-    }, { rootMargin: "0px 0px -12% 0px" });
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.classList.add("is-visible");
+          obs.disconnect();
+        }
+      },
+      { rootMargin: "0px 0px -12% 0px" }
+    );
     obs.observe(el);
     return () => obs.disconnect();
   }, []);
 
   const nodes = children.split(" ").map((w, i) => {
-    const isMoriarty = w.replace(/[^a-zA-Z]/g, '') === "Moriarty" || w.replace(/[^a-zA-Z]/g, '') === "Moriatry";
+    const isMoriarty =
+      w.replace(/[^a-zA-Z]/g, "") === "Moriarty" || w.replace(/[^a-zA-Z]/g, "") === "Moriatry";
     return (
-      <span key={i} className="w inline-block mr-[0.25em] reveal-fade" style={{ transitionDelay: `${i * 0.04}s` }}>
-        <span className={`inline-block ${isMoriarty ? "text-[var(--orange)]" : ""}`}>{w.replace("Moriatry", "Moriarty")}</span>
+      <span
+        key={i}
+        className="w inline-block mr-[0.25em] reveal-fade"
+        style={{ transitionDelay: `${i * 0.04}s` }}
+      >
+        <span className={`inline-block ${isMoriarty ? "text-[var(--orange)]" : ""}`}>
+          {w.replace("Moriatry", "Moriarty")}
+        </span>
       </span>
     );
   });
 
-  const TagAny = Tag as any;
-  return <TagAny ref={ref} className={`${className} reveal-group`}>{nodes}</TagAny>;
+  const Component = Tag as React.ElementType;
+  return (
+    <Component ref={ref} className={`${className} reveal-group`}>
+      {nodes}
+    </Component>
+  );
 }
 
 /* --- Counter with count-up on scroll --- */
@@ -104,7 +127,7 @@ export function Counter({
 }) {
   const { ref } = useCountUp(to, duration, decimals, 0, prefix, suffix);
   return (
-    <span ref={ref as any} className={className}>
+    <span ref={ref} className={className}>
       {prefix}0{suffix}
     </span>
   );
@@ -115,16 +138,19 @@ export function Magnetic({
   children,
   className = "",
   strength = 0.175,
+  as: Tag = "div",
 }: {
   children: React.ReactNode;
   className?: string;
   strength?: number;
+  as?: keyof HTMLElementTagNameMap;
 }) {
-  const ref = useMagnetic<HTMLDivElement>(strength);
+  const ref = useMagnetic<HTMLElement>(strength);
+  const Component = Tag as React.ElementType;
   return (
-    <div ref={ref} className={className} style={{ display: "inline-block" }}>
+    <Component ref={ref} className={className} style={{ display: "inline-block" }}>
       {children}
-    </div>
+    </Component>
   );
 }
 
@@ -136,19 +162,20 @@ export function Scramble({
 }: {
   children: string;
   className?: string;
-  as?: any;
+  as?: keyof HTMLElementTagNameMap;
 }) {
   const ref = useRef<HTMLElement>(null);
   const { scramble, reset } = useScramble();
 
+  const Component = Tag as React.ElementType;
   return (
-    <Tag
+    <Component
       ref={ref}
       className={className}
       onMouseEnter={() => ref.current && scramble(ref.current)}
       onMouseLeave={() => ref.current && reset(ref.current)}
     >
       {children}
-    </Tag>
+    </Component>
   );
 }

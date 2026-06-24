@@ -54,7 +54,13 @@ const frag = `
 `;
 
 /* ─── Mobile-only: CSS filter-based image (zero WebGL, zero GPU contexts) ─── */
-const MobileProjectImage = memo(function MobileProjectImage({ src, active }: { src: string; active: boolean }) {
+const MobileProjectImage = memo(function MobileProjectImage({
+  src,
+  active,
+}: {
+  src: string;
+  active: boolean;
+}) {
   return (
     <div className="absolute inset-0 w-full h-full">
       <img
@@ -62,6 +68,9 @@ const MobileProjectImage = memo(function MobileProjectImage({ src, active }: { s
         alt=""
         loading="lazy"
         decoding="async"
+        onError={(e) => {
+          e.currentTarget.src = "/images/hero-ink.jpg";
+        }}
         className="w-full h-full object-cover transition-[filter] duration-700"
         style={{
           filter: active ? "saturate(1)" : "saturate(0.55)",
@@ -72,7 +81,13 @@ const MobileProjectImage = memo(function MobileProjectImage({ src, active }: { s
 });
 
 /* ─── Desktop-only: Vanilla WebGL shader image ─── */
-const WebGLProjectImage = memo(function WebGLProjectImage({ src, active }: { src: string; active: boolean }) {
+const WebGLProjectImage = memo(function WebGLProjectImage({
+  src,
+  active,
+}: {
+  src: string;
+  active: boolean;
+}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const hoverRef = useRef(0);
@@ -108,7 +123,11 @@ const WebGLProjectImage = memo(function WebGLProjectImage({ src, active }: { src
 
     const buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, -1,1, 1,-1, 1,1]), gl.STATIC_DRAW);
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]),
+      gl.STATIC_DRAW
+    );
 
     const posLoc = gl.getAttribLocation(program, "position");
     gl.enableVertexAttribArray(posLoc);
@@ -121,11 +140,24 @@ const WebGLProjectImage = memo(function WebGLProjectImage({ src, active }: { src
 
     const texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0,0,0,0]));
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      0,
+      gl.RGBA,
+      1,
+      1,
+      0,
+      gl.RGBA,
+      gl.UNSIGNED_BYTE,
+      new Uint8Array([0, 0, 0, 0])
+    );
 
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.src = src;
+    img.onerror = () => {
+      img.src = "/images/hero-ink.jpg";
+    };
     img.onload = () => {
       // 👱‍♀️ ponytail: Native WebGL fix for upside-down images
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
@@ -163,13 +195,16 @@ const WebGLProjectImage = memo(function WebGLProjectImage({ src, active }: { src
       raf = requestAnimationFrame(loop);
     };
 
-    const observer = new IntersectionObserver((entries) => {
-      isVisible = entries[0].isIntersecting;
-      if (isVisible) {
-        cancelAnimationFrame(raf);
-        raf = requestAnimationFrame(loop);
-      }
-    }, { rootMargin: "200px" });
+    const observer = new IntersectionObserver(
+      (entries) => {
+        isVisible = entries[0].isIntersecting;
+        if (isVisible) {
+          cancelAnimationFrame(raf);
+          raf = requestAnimationFrame(loop);
+        }
+      },
+      { rootMargin: "200px" }
+    );
     observer.observe(container);
 
     return () => {

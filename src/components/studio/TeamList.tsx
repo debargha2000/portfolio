@@ -54,12 +54,17 @@ export function TeamList({ team }: { team: { n: string; r: string; b: string; im
             <div className="col-span-12 md:col-span-6 font-display text-4xl md:text-6xl leading-none group-hover:translate-x-4 transition-transform duration-500">
               {m.n.split(" ").map((word, idx, arr) => (
                 <span key={idx} className={word === "Moriarty" ? "text-[var(--orange)]" : ""}>
-                  {word}{idx < arr.length - 1 ? " " : ""}
+                  {word}
+                  {idx < arr.length - 1 ? " " : ""}
                 </span>
               ))}
             </div>
-            <div className="col-span-7 md:col-span-4 text-sm text-[var(--bone)]/70 group-hover:text-[var(--acid)] transition-colors">{m.r}</div>
-            <div className="col-span-5 md:col-span-2 text-xs uppercase tracking-widest text-[var(--bone)]/50 text-right group-hover:text-[var(--acid)] transition-colors">{m.b}</div>
+            <div className="col-span-7 md:col-span-4 text-sm text-[var(--bone)]/70 group-hover:text-[var(--acid)] transition-colors">
+              {m.r}
+            </div>
+            <div className="col-span-5 md:col-span-2 text-xs uppercase tracking-widest text-[var(--bone)]/50 text-right group-hover:text-[var(--acid)] transition-colors">
+              {m.b}
+            </div>
           </li>
         ))}
       </ul>
@@ -68,7 +73,19 @@ export function TeamList({ team }: { team: { n: string; r: string; b: string; im
         className={`${styles.portrait} ${portrait ? styles.isOpen : ""}`}
         style={{ transform: "translate3d(-50%, -50%, 0) scale(1)" }}
       >
-        {portrait && <img src={portrait.img} alt="" loading="lazy" className="w-full h-full object-cover" />}
+        {portrait && (
+          <img
+            src={portrait.img}
+            alt=""
+            onError={(e) => {
+              e.currentTarget.src = "/images/hero-ink.jpg";
+            }}
+            width={800}
+            height={1200}
+            loading="lazy"
+            className="w-full h-full object-cover"
+          />
+        )}
       </div>
     </>
   );

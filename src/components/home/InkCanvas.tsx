@@ -8,7 +8,11 @@ function DesktopInkCanvas() {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const gl = canvas.getContext("webgl", { antialias: false, alpha: false, powerPreference: "high-performance" });
+    const gl = canvas.getContext("webgl", {
+      antialias: false,
+      alpha: false,
+      powerPreference: "high-performance",
+    });
     if (!gl) return;
 
     const compile = (type: number, source: string) => {
@@ -31,10 +35,11 @@ function DesktopInkCanvas() {
 
     const buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-      -1, -1,  1, -1, -1,  1,
-      -1,  1,  1, -1,  1,  1
-    ]), gl.STATIC_DRAW);
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]),
+      gl.STATIC_DRAW
+    );
 
     const positionLoc = gl.getAttribLocation(program, "position");
     gl.enableVertexAttribArray(positionLoc);
@@ -116,9 +121,12 @@ export function InkCanvas() {
       <div className="h-full w-full">
         <img
           src="/images/hero-ink.jpg"
-          alt=""
-          className="w-full h-full object-cover"
+          alt="Abstract ink fluid"
           fetchPriority="high"
+          onError={(e) => {
+            e.currentTarget.src = "/images/fallback.jpg";
+          }}
+          className="w-full h-full object-cover grayscale opacity-40 mix-blend-screen"
         />
       </div>
     );

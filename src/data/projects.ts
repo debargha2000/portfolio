@@ -1,11 +1,4 @@
-export interface CaseBlock {
-  type: "image" | "image-pair" | "quote" | "text" | "stats" | "full-bleed";
-  src?: string;
-  src2?: string;
-  caption?: string;
-  text?: string;
-  items?: { label: string; value: string }[];
-}
+import type { CaseBlock } from "./types";
 
 export interface Project {
   slug: string;
@@ -410,8 +403,7 @@ export const PROJECTS: Project[] = [
   },
 ];
 
-export const getProject = (slug: string) =>
-  PROJECTS.find((p) => p.slug === slug);
+export const getProject = (slug: string) => PROJECTS.find((p) => p.slug === slug);
 
 export const getNextProject = (slug: string) => {
   const i = PROJECTS.findIndex((p) => p.slug === slug);

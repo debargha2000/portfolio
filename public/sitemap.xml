@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://debarghamoriarty.com/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://debarghamoriarty.com/work</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://debarghamoriarty.com/studio</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://debarghamoriarty.com/process</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://debarghamoriarty.com/contact</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url><loc>https://debarghamoriarty.com/work/octave</loc><priority>0.9</priority></url>
+  <url><loc>https://debarghamoriarty.com/work/maison-rouge</loc><priority>0.9</priority></url>
+  <url><loc>https://debarghamoriarty.com/work/kiosk-01</loc><priority>0.9</priority></url>
+  <url><loc>https://debarghamoriarty.com/work/y-42</loc><priority>0.9</priority></url>
+  <url><loc>https://debarghamoriarty.com/work/norda</loc><priority>0.9</priority></url>
+</urlset>

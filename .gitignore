@@ -18,3 +18,10 @@ coverage/
 # Misc
 .DS_Store
 *.local
+
+# Local AI tooling folders
+.gemini/
+.cursor/
+.windsurf/
+.aider*
+.continue/

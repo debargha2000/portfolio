@@ -3,22 +3,23 @@ import { useEffect, useLayoutEffect, useRef, useCallback } from "react";
 /* ─── Shared mouse position (single global listener instead of N) ─── */
 const mousePos = { x: 0, y: 0 };
 let mouseListenerAttached = false;
-let mouseSubscribers = 0;
 
 function attachMouseListener() {
   if (mouseListenerAttached) return;
   mouseListenerAttached = true;
-  window.addEventListener("mousemove", (e) => {
-    mousePos.x = e.clientX;
-    mousePos.y = e.clientY;
-  }, { passive: true });
+  window.addEventListener(
+    "mousemove",
+    (e) => {
+      mousePos.x = e.clientX;
+      mousePos.y = e.clientY;
+    },
+    { passive: true }
+  );
 }
 
 function useSharedMouse() {
   useEffect(() => {
-    mouseSubscribers++;
     attachMouseListener();
-    return () => { mouseSubscribers--; };
   }, []);
   return mousePos;
 }
@@ -38,22 +39,29 @@ export function useNumberFlip(target: number, duration = 1.5) {
       return;
     }
     let raf = 0;
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        const startTime = performance.now();
-        const loop = (now: number) => {
-          const progress = Math.min((now - startTime) / (duration * 1000), 1);
-          const eased = 1 - Math.pow(1 - progress, 3);
-          const current = Math.floor(eased * target);
-          if (ref.current) ref.current.textContent = String(current).padStart(String(target).length, "0");
-          if (progress < 1) raf = requestAnimationFrame(loop);
-        };
-        raf = requestAnimationFrame(loop);
-        observer.disconnect();
-      }
-    }, { rootMargin: "0px 0px -15% 0px" });
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          const startTime = performance.now();
+          const loop = (now: number) => {
+            const progress = Math.min((now - startTime) / (duration * 1000), 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            const current = Math.floor(eased * target);
+            if (ref.current)
+              ref.current.textContent = String(current).padStart(String(target).length, "0");
+            if (progress < 1) raf = requestAnimationFrame(loop);
+          };
+          raf = requestAnimationFrame(loop);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "0px 0px -15% 0px" }
+    );
     observer.observe(ref.current);
-    return () => { observer.disconnect(); cancelAnimationFrame(raf); };
+    return () => {
+      observer.disconnect();
+      cancelAnimationFrame(raf);
+    };
   }, [target, duration]);
   return { ref };
 }
@@ -65,17 +73,20 @@ export function useCircleReveal<T extends HTMLElement>(delay = 0) {
     const el = ref.current;
     if (!el) return;
     if (prefersReducedMotion()) return;
-    
+
     el.classList.add("reveal-circle");
     if (delay) el.style.transitionDelay = `${delay}s`;
 
-    const obs = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) {
-        el.classList.add("is-visible");
-        obs.disconnect();
-      }
-    }, { rootMargin: "0px 0px -15% 0px" });
-    
+    const obs = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) {
+          el.classList.add("is-visible");
+          obs.disconnect();
+        }
+      },
+      { rootMargin: "0px 0px -15% 0px" }
+    );
+
     obs.observe(el);
     return () => obs.disconnect();
   }, [delay]);
@@ -93,24 +104,37 @@ export function useMagnetic<T extends HTMLElement>(strength = 0.175) {
     if (prefersReducedMotion() || window.matchMedia("(hover: none)").matches) return;
 
     let raf = 0;
-    let tx = 0, ty = 0, cx = 0, cy = 0;
+    let tx = 0,
+      ty = 0,
+      cx = 0,
+      cy = 0;
     let running = false;
     let rect: DOMRect | null = null;
     let lastScroll = window.scrollY;
     let isVisible = false;
 
-    const observer = new IntersectionObserver(([entry]) => {
-      isVisible = entry.isIntersecting;
-      if (!isVisible) {
-        tx = 0; ty = 0;
-        if (running) { running = false; cancelAnimationFrame(raf); }
-        el.style.transform = '';
-      }
-    }, { rootMargin: "50px" });
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisible = entry.isIntersecting;
+        if (!isVisible) {
+          tx = 0;
+          ty = 0;
+          if (running) {
+            running = false;
+            cancelAnimationFrame(raf);
+          }
+          el.style.transform = "";
+        }
+      },
+      { rootMargin: "50px" }
+    );
     observer.observe(el);
 
     const loop = () => {
-      if (!isVisible) { running = false; return; }
+      if (!isVisible) {
+        running = false;
+        return;
+      }
       if (!rect || Math.abs(window.scrollY - lastScroll) > 10) {
         rect = el.getBoundingClientRect();
         lastScroll = window.scrollY;
@@ -123,7 +147,8 @@ export function useMagnetic<T extends HTMLElement>(strength = 0.175) {
         tx = mx * strength;
         ty = my * strength;
       } else {
-        tx = 0; ty = 0;
+        tx = 0;
+        ty = 0;
       }
 
       cx += (tx - cx) * 0.18;
@@ -163,7 +188,10 @@ export function useTilt<T extends HTMLElement>(max = 6) {
     if (prefersReducedMotion() || window.matchMedia("(hover: none)").matches) return;
 
     let raf = 0;
-    let tx = 0, ty = 0, cx = 0, cy = 0;
+    let tx = 0,
+      ty = 0,
+      cx = 0,
+      cy = 0;
     let running = false;
     let rect: DOMRect | null = null;
     let lastScroll = window.scrollY;
@@ -185,7 +213,11 @@ export function useTilt<T extends HTMLElement>(max = 6) {
       ty = px * max;
       startLoop();
     };
-    const onLeave = () => { tx = 0; ty = 0; startLoop(); };
+    const onLeave = () => {
+      tx = 0;
+      ty = 0;
+      startLoop();
+    };
     const loop = () => {
       cx += (tx - cx) * 0.12;
       cy += (ty - cy) * 0.12;
@@ -208,7 +240,14 @@ export function useTilt<T extends HTMLElement>(max = 6) {
 }
 
 /* ---------- Count up ---------- */
-export function useCountUp(target: number, duration = 1.6, decimals = 0, start = 0, prefix = "", suffix = "") {
+export function useCountUp(
+  target: number,
+  duration = 1.6,
+  decimals = 0,
+  start = 0,
+  prefix = "",
+  suffix = ""
+) {
   const ref = useRef<HTMLSpanElement>(null);
   useEffect(() => {
     if (!ref.current) return;
@@ -218,22 +257,26 @@ export function useCountUp(target: number, duration = 1.6, decimals = 0, start =
     }
 
     let raf = 0;
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        const startTime = performance.now();
-        const loop = (now: number) => {
-          const progress = Math.min((now - startTime) / (duration * 1000), 1);
-          const eased = 1 - Math.pow(1 - progress, 3);
-          const current = start + (target - start) * eased;
-          if (ref.current) {
-            ref.current.textContent = prefix + Number(current.toFixed(decimals)).toLocaleString() + suffix;
-          }
-          if (progress < 1) raf = requestAnimationFrame(loop);
-        };
-        raf = requestAnimationFrame(loop);
-        observer.disconnect();
-      }
-    }, { rootMargin: "0px 0px -15% 0px" });
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          const startTime = performance.now();
+          const loop = (now: number) => {
+            const progress = Math.min((now - startTime) / (duration * 1000), 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            const current = start + (target - start) * eased;
+            if (ref.current) {
+              ref.current.textContent =
+                prefix + Number(current.toFixed(decimals)).toLocaleString() + suffix;
+            }
+            if (progress < 1) raf = requestAnimationFrame(loop);
+          };
+          raf = requestAnimationFrame(loop);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "0px 0px -15% 0px" }
+    );
 
     observer.observe(ref.current);
     return () => {
@@ -265,24 +308,27 @@ export function useScramble() {
     let frame = 0;
     let raf = 0;
     const update = () => {
-      let out = "";
       let complete = 0;
+      const fragment = document.createDocumentFragment();
       for (let i = 0; i < queue.length; i++) {
         const q = queue[i];
         const { from: f, to: t, start, end } = q;
         if (frame >= end) {
           complete++;
-          out += t;
+          fragment.appendChild(document.createTextNode(t));
         } else if (frame >= start) {
           if (!q.char || Math.random() < 0.28) {
             q.char = CHARS[Math.floor(Math.random() * CHARS.length)];
           }
-          out += `<span class="text-[var(--acid)]">${q.char}</span>`;
+          const span = document.createElement("span");
+          span.className = "text-[var(--acid)]";
+          span.textContent = q.char;
+          fragment.appendChild(span);
         } else {
-          out += f;
+          fragment.appendChild(document.createTextNode(f));
         }
       }
-      el.innerHTML = out;
+      el.replaceChildren(fragment);
       if (complete < queue.length) {
         frame++;
         raf = requestAnimationFrame(update);
@@ -307,17 +353,20 @@ export function useReveal<T extends HTMLElement>(delay = 0) {
     const el = ref.current;
     if (!el) return;
     if (prefersReducedMotion()) return;
-    
+
     el.classList.add("reveal-fade");
     if (delay) el.style.transitionDelay = `${delay}s`;
 
-    const obs = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) {
-        el.classList.add("is-visible");
-        obs.disconnect();
-      }
-    }, { rootMargin: "0px 0px -12% 0px" });
-    
+    const obs = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) {
+          el.classList.add("is-visible");
+          obs.disconnect();
+        }
+      },
+      { rootMargin: "0px 0px -12% 0px" }
+    );
+
     obs.observe(el);
     return () => obs.disconnect();
   }, [delay]);
@@ -325,26 +374,32 @@ export function useReveal<T extends HTMLElement>(delay = 0) {
 }
 
 /* ---------- Clip-path reveal (Ponytail CSS Observer) ---------- */
-export function useClipReveal<T extends HTMLElement>(variant: "circle" | "h" | "v" = "h", delay = 0) {
+export function useClipReveal<T extends HTMLElement>(
+  variant: "circle" | "h" | "v" = "h",
+  delay = 0
+) {
   const ref = useRef<T>(null);
   useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
     if (prefersReducedMotion()) return;
-    
+
     if (variant === "circle") el.classList.add("reveal-circle");
     else if (variant === "h") el.classList.add("reveal-clip-h");
     else el.classList.add("reveal-clip-v");
-    
+
     if (delay) el.style.transitionDelay = `${delay}s`;
 
-    const obs = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) {
-        el.classList.add("is-visible");
-        obs.disconnect();
-      }
-    }, { rootMargin: "0px 0px -15% 0px" });
-    
+    const obs = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) {
+          el.classList.add("is-visible");
+          obs.disconnect();
+        }
+      },
+      { rootMargin: "0px 0px -15% 0px" }
+    );
+
     obs.observe(el);
     return () => obs.disconnect();
   }, [variant, delay]);
@@ -379,19 +434,19 @@ export function useScrollSkew<T extends HTMLElement>(max = 8) {
   useEffect(() => {
     const el = ref.current;
     if (!el || prefersReducedMotion()) return;
-    
+
     let raf = 0;
     let lastScroll = window.scrollY;
     let skew = 0;
-    
+
     const update = () => {
       const scroll = window.scrollY;
       const velocity = scroll - lastScroll;
       lastScroll = scroll;
-      
+
       const targetSkew = Math.max(-max, Math.min(max, velocity * -0.05));
       skew += (targetSkew - skew) * 0.1;
-      
+
       el.style.transform = `skewY(${skew}deg)`;
       raf = requestAnimationFrame(update);
     };

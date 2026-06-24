@@ -46,3 +46,28 @@ body {
 #root {
   overflow-x: hidden;
 }
+
+/* Keyboard focus indicators — visible at all times */
+*:focus {
+  outline: none;
+}
+*:focus-visible {
+  outline: 2px solid var(--acid);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* High-contrast mode: thicker outline */
+@media (prefers-contrast: more) {
+  *:focus-visible {
+    outline-width: 3px;
+    outline-offset: 4px;
+  }
+}
+
+/* Make sure focus-visible works on dark-bg interactive elements too */
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible {
+  outline-color: var(--acid);
+}

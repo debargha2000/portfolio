@@ -1,19 +1,30 @@
 import React from "react";
 import { Scramble } from "../../components/motion/Motion";
 import { useTilt, useReveal, useMagnetic } from "../../hooks/motionUtils";
+import { mergeRefs } from "../../hooks/useMergedRefs";
 
-const ServiceCard = React.memo(function ServiceCard({ c, i }: { c: { n: string; t: string; d: string; icon: string }; i: number }) {
+const ServiceCard = React.memo(function ServiceCard({
+  c,
+  i,
+}: {
+  c: { n: string; t: string; d: string; icon: string };
+  i: number;
+}) {
   const tilt = useTilt<HTMLDivElement>(3);
   const reveal = useReveal<HTMLDivElement>(0.05 * i);
   const magIcon = useMagnetic<HTMLDivElement>(0.3);
   return (
     <div
-      ref={(n) => { (tilt as any).current = n; (reveal as any).current = n; }}
+      ref={mergeRefs(tilt, reveal)}
       className="tilt-card shine border-t border-[var(--bone)]/15 pt-6 p-4 -m-4"
     >
       <div className="flex justify-between items-start mb-8">
-        <div className="font-mono text-[11px] font-medium tracking-[0.2em] uppercase text-[var(--bone)]/40">{c.n}</div>
-        <div ref={magIcon} className="text-3xl text-[var(--acid)]">{c.icon}</div>
+        <div className="font-mono text-[11px] font-medium tracking-[0.2em] uppercase text-[var(--bone)]/40">
+          {c.n}
+        </div>
+        <div ref={magIcon} className="text-3xl text-[var(--acid)]">
+          {c.icon}
+        </div>
       </div>
       <h4 className="font-display display-regular text-4xl mb-4 tracking-[-0.025em]">
         <Scramble>{c.t}</Scramble>
@@ -25,12 +36,42 @@ const ServiceCard = React.memo(function ServiceCard({ c, i }: { c: { n: string; 
 
 export default function Services() {
   const caps = [
-    { n: "01", t: "Brand Systems", d: "Identity, type, guidelines, and the rituals that make a brand feel inevitable.", icon: "◐" },
-    { n: "02", t: "Editorial Web", d: "Long-form sites that read like print and move like film.", icon: "◈" },
-    { n: "03", t: "Interactive 3D", d: "WebGL experiences, shader work, spatial interfaces.", icon: "◉" },
-    { n: "04", t: "Art Direction", d: "Campaigns, lookbooks, and the visual grammar that ties them together.", icon: "◊" },
-    { n: "05", t: "Type Systems", d: "Custom typefaces, variable fonts, typographic conventions.", icon: "◌" },
-    { n: "06", t: "Creative Code", d: "Installations, generative prints, tools for internal teams.", icon: "◍" },
+    {
+      n: "01",
+      t: "Brand Systems",
+      d: "Identity, type, guidelines, and the rituals that make a brand feel inevitable.",
+      icon: "◐",
+    },
+    {
+      n: "02",
+      t: "Editorial Web",
+      d: "Long-form sites that read like print and move like film.",
+      icon: "◈",
+    },
+    {
+      n: "03",
+      t: "Interactive 3D",
+      d: "WebGL experiences, shader work, spatial interfaces.",
+      icon: "◉",
+    },
+    {
+      n: "04",
+      t: "Art Direction",
+      d: "Campaigns, lookbooks, and the visual grammar that ties them together.",
+      icon: "◊",
+    },
+    {
+      n: "05",
+      t: "Type Systems",
+      d: "Custom typefaces, variable fonts, typographic conventions.",
+      icon: "◌",
+    },
+    {
+      n: "06",
+      t: "Creative Code",
+      d: "Installations, generative prints, tools for internal teams.",
+      icon: "◍",
+    },
   ];
 
   return (
@@ -43,7 +84,8 @@ export default function Services() {
           </h2>
         </div>
         <p className="max-w-sm text-sm leading-relaxed text-[var(--bone)]/70 font-sans font-light">
-          Six disciplines, practiced deeply. Most engagements pull from three or four. Nothing is outsourced.
+          Six disciplines, practiced deeply. Most engagements pull from three or four. Nothing is
+          outsourced.
         </p>
       </div>
 
