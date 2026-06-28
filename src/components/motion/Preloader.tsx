@@ -5,39 +5,20 @@ interface Props {
   onComplete: () => void;
 }
 
+const MIN_DISPLAY_MS = 800;
+const CRITICAL_IMAGES = ["/images/hero-ink.jpg", "/images/debargha-moriarty.jpg"];
+
 export default function Preloader({ onComplete }: Props) {
   const [displayComplete, setDisplayComplete] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [progressVal, setProgressVal] = useState(0);
   const root = useRef<HTMLDivElement>(null);
-  const counterRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     // Trigger entry animations
     const t = setTimeout(() => setMounted(true), 50);
     return () => clearTimeout(t);
   }, []);
-
-  useEffect(() => {
-    // Fake loading progress
-    let progress = 0;
-    let raf: number;
-    const animate = () => {
-      progress += (100 - progress) * 0.08;
-      const current = Math.floor(progress);
-      setProgressVal(current);
-      if (counterRef.current) {
-        counterRef.current.innerText = String(current).padStart(3, "0");
-      }
-      if (progress > 99.5 && !displayComplete) {
-        setDisplayComplete(true);
-      } else if (progress <= 99.5) {
-        raf = requestAnimationFrame(animate);
-      }
-    };
-    raf = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(raf);
-  }, [displayComplete]);
 
   useEffect(() => {
     if (displayComplete && root.current) {
@@ -49,12 +30,93 @@ export default function Preloader({ onComplete }: Props) {
     }
   }, [displayComplete, onComplete]);
 
+  useEffect(() => {
+    // ponytail: minimum that works. No LoadingManager, no separate hooks.
+    let isCancelled = false;
+    let currentProgress = 0;
+
+    const updateProgress = (add: number) => {
+      if (isCancelled) return;
+      currentProgress = Math.min(100, currentProgress + add);
+      setProgressVal(Math.floor(currentProgress));
+    };
+
+    const loadImage = (src: string) =>
+      new Promise<void>((resolve) => {
+        const img = new Image();
+        img.src = src;
+        img.onload = () => resolve();
+        img.onerror = () => resolve(); // continue even if error
+      }).then(() => updateProgress(20 / CRITICAL_IMAGES.length)); // Images total 20%
+
+    const init = async () => {
+      updateProgress(10); // DOM ready/Init 10%
+
+      const tasks = [];
+
+      // 1. Fonts (40%)
+      if (document.fonts) {
+        tasks.push(
+          document.fonts.ready.then(() => {
+            updateProgress(40);
+          })
+        );
+      } else {
+        updateProgress(40);
+      }
+
+      // 2. Images (20%)
+      tasks.push(...CRITICAL_IMAGES.map(loadImage));
+
+      // 3. WebGL detection (10%)
+      tasks.push(
+        new Promise<void>((resolve) => {
+          try {
+            const canvas = document.createElement("canvas");
+            const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+            if (gl) {
+              sessionStorage.setItem("webgl_supported", "true");
+            }
+          } catch {
+            // ignore
+          }
+          updateProgress(10);
+          resolve();
+        })
+      );
+
+      // 4. Min display time (20%)
+      tasks.push(
+        new Promise<void>((resolve) => setTimeout(resolve, MIN_DISPLAY_MS)).then(() =>
+          updateProgress(20)
+        )
+      );
+
+      // 15s timeout fallback
+      const timeout = new Promise<void>((resolve) => setTimeout(resolve, 15000));
+
+      await Promise.race([Promise.all(tasks), timeout]);
+
+      if (!isCancelled) {
+        setProgressVal(100);
+        setTimeout(() => setDisplayComplete(true), 100);
+      }
+    };
+
+    init();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
+
   return (
     <div
       ref={root}
       className={styles.preloader}
       role="status"
       aria-live="polite"
+      aria-busy={!displayComplete}
       aria-label={`Loading portfolio — ${progressVal}%`}
     >
       <div className="absolute top-8 left-8 flex items-center gap-3 text-xs uppercase tracking-widest">
@@ -86,8 +148,8 @@ export default function Preloader({ onComplete }: Props) {
           Portfolio <span className="text-[var(--bone)]/40">/</span> 2021 — 2026
         </span>
         <span>
-          <span ref={counterRef} className="tabular-nums text-2xl font-sans font-light">
-            000
+          <span className="tabular-nums text-2xl font-sans font-light">
+            {String(progressVal).padStart(3, "0")}
           </span>
           <span className="ml-2 text-[var(--bone)]/40">%</span>
         </span>
