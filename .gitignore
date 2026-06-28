@@ -25,3 +25,10 @@ coverage/
 .windsurf/
 .aider*
 .continue/
+
+# Local AI tooling folders
+.gemini/
+.cursor/
+.windsurf/
+.aider*
+.continue/
