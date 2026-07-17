@@ -8,35 +8,20 @@ export interface Movement {
   quote: string;
   bg: string;
 }
-
 export interface Engagement {
   t: string;
   d: string;
   from: string;
   dur: string;
 }
-
 export interface FAQ {
   q: string;
   a: string;
 }
-
 export interface ProcessData {
   movements: Movement[];
   engagements: Engagement[];
   faq: FAQ[];
-}
-
-export interface TeamMember {
-  n: string;
-  r: string;
-  b: string;
-  img: string;
-}
-
-export interface TimelineEvent {
-  y: string;
-  t: string;
 }
 
 export interface Belief {
@@ -44,16 +29,14 @@ export interface Belief {
   d: string;
   icon: string;
 }
-
 export interface Quote {
   q: string;
   a: string;
 }
-
 export interface StudioData {
   bio: string;
-  team: TeamMember[];
-  timeline: TimelineEvent[];
+  team: { n: string; r: string; b: string; img: string }[];
+  timeline: { y: string; t: string }[];
   clients: string[];
   beliefs: Belief[];
   quotes: Quote[];
@@ -64,17 +47,11 @@ export interface PressQuote {
   a: string;
   y: string;
 }
-
-export interface StatItem {
-  label: string;
-  value: string;
-}
-
 export interface CaseBlock {
   type: "image" | "image-pair" | "quote" | "text" | "stats" | "full-bleed";
   src?: string;
   src2?: string;
   caption?: string;
   text?: string;
-  items?: StatItem[];
+  items?: { label: string; value: string }[];
 }

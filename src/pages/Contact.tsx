@@ -1,6 +1,36 @@
 import { useState } from "react";
 import { useDocumentMeta } from "../hooks/useDocumentMeta";
 import { CharReveal, WordReveal, Magnetic, Scramble } from "../components/motion/Motion";
+import {
+  AvailCell,
+  InputField,
+  SelectField,
+  SidebarBlock,
+  FAQCard,
+} from "../components/contact/ContactComponents";
+
+const AVAILABILITY = [
+  { q: "Q1 '26", s: "Closed", c: "bg-[var(--bone)]/10 text-[var(--bone)]/50", pulse: false },
+  { q: "Q2 '26", s: "2 slots", c: "bg-[var(--acid)] text-[var(--bg)]", pulse: true },
+  { q: "Q3 '26", s: "3 slots", c: "bg-[var(--acid)] text-[var(--bg)]", pulse: true },
+  { q: "Q4 '26", s: "Open", c: "bg-[var(--acid)] text-[var(--bg)]", pulse: false },
+] as const;
+
+const FAQ = [
+  {
+    q: "How quickly do you reply?",
+    a: "Within two working days. Every enquiry is read by a partner, not an assistant.",
+  },
+  {
+    q: "What's the minimum engagement?",
+    a: "€80k for a focused project. Below that, we're probably not the right fit.",
+  },
+  {
+    q: "Can we meet in person?",
+    a: "Always — if you can get to Berlin. We don't travel for first meetings.",
+  },
+  { q: "Do you hire?", a: "Rarely. When we do, we announce it here and on Are.na." },
+] as const;
 
 export default function Contact() {
   const [form, setForm] = useState({
@@ -14,48 +44,36 @@ export default function Contact() {
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const validate = () => {
-    const e: Record<string, string> = {};
-    if (!form.name.trim()) e.name = "Please tell us your name.";
-    if (!form.email.match(/^[^@]+@[^@]+\.[^@]+$/)) e.email = "Please use a valid email address.";
-    if (!form.message.trim()) e.message = "Please describe the project.";
-    return e;
-  };
+  useDocumentMeta(
+    "Contact — DEBARGHA MORIARTY",
+    "Let's make something worth it. Start a conversation with us."
+  );
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const validationErrors = validate();
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return;
-    }
+    const err: Record<string, string> = {};
+    if (!form.name.trim()) err.name = "Please tell us your name.";
+    if (!form.email.match(/^[^@]+@[^@]+\.[^@]+$/)) err.email = "Please use a valid email address.";
+    if (!form.message.trim()) err.message = "Please describe the project.";
+
+    if (Object.keys(err).length > 0) return setErrors(err);
     setErrors({});
     setSubmitted(true);
-    // Confetti burst
+
     const colors = ["#c6ff3d", "#ff4d1f", "#f4f1ea", "#a4e022"];
     for (let i = 0; i < 60; i++) {
       const c = document.createElement("div");
-      c.style.cssText = `
-        position: fixed;
-        width: ${Math.random() * 10 + 4}px;
-        height: ${Math.random() * 10 + 4}px;
-        background: ${colors[Math.floor(Math.random() * colors.length)]};
-        left: 50vw;
-        top: 50vh;
-        z-index: 9999;
-        pointer-events: none;
-        border-radius: ${Math.random() > 0.5 ? "50%" : "2px"};
-      `;
+      c.style.cssText = `position:fixed;width:${Math.random() * 10 + 4}px;height:${Math.random() * 10 + 4}px;background:${colors[Math.floor(Math.random() * 4)]};left:50vw;top:50vh;z-index:9999;pointer-events:none;border-radius:${Math.random() > 0.5 ? "50%" : "2px"};`;
       document.body.appendChild(c);
-      const angle = Math.random() * Math.PI * 2;
-      const velocity = Math.random() * 400 + 200;
-      const vx = Math.cos(angle) * velocity;
-      const vy = Math.sin(angle) * velocity;
-      const rotation = Math.random() * 720 - 360;
+      const angle = Math.random() * Math.PI * 2,
+        vel = Math.random() * 400 + 200;
       c.animate(
         [
           { transform: "translate(0, 0) rotate(0deg)", opacity: "1" },
-          { transform: `translate(${vx}px, ${vy + 500}px) rotate(${rotation}deg)`, opacity: "0" },
+          {
+            transform: `translate(${Math.cos(angle) * vel}px, ${Math.sin(angle) * vel + 500}px) rotate(${Math.random() * 720 - 360}deg)`,
+            opacity: "0",
+          },
         ],
         { duration: 2000, easing: "cubic-bezier(0.25, 0.46, 0.45, 0.94)" }
       );
@@ -63,34 +81,6 @@ export default function Contact() {
     }
     setTimeout(() => setSubmitted(false), 4500);
   };
-
-  const availability = [
-    { q: "Q1 '26", s: "Closed", c: "bg-[var(--bone)]/10 text-[var(--bone)]/50", pulse: false },
-    { q: "Q2 '26", s: "2 slots", c: "bg-[var(--acid)] text-[var(--bg)]", pulse: true },
-    { q: "Q3 '26", s: "3 slots", c: "bg-[var(--acid)] text-[var(--bg)]", pulse: true },
-    { q: "Q4 '26", s: "Open", c: "bg-[var(--acid)] text-[var(--bg)]", pulse: false },
-  ];
-
-  const faq = [
-    {
-      q: "How quickly do you reply?",
-      a: "Within two working days. Every enquiry is read by a partner, not an assistant.",
-    },
-    {
-      q: "What's the minimum engagement?",
-      a: "€80k for a focused project. Below that, we're probably not the right fit.",
-    },
-    {
-      q: "Can we meet in person?",
-      a: "Always — if you can get to Berlin. We don't travel for first meetings.",
-    },
-    { q: "Do you hire?", a: "Rarely. When we do, we announce it here and on Are.na." },
-  ];
-
-  useDocumentMeta(
-    "Contact — DEBARGHA MORIARTY",
-    "Let's make something worth it. Start a conversation with us."
-  );
 
   return (
     <main id="main" tabIndex={-1} className="pt-32 md:pt-40 pb-20 px-6 md:px-10">
@@ -115,20 +105,18 @@ export default function Contact() {
         </div>
       </div>
 
-      {/* Availability with pulse */}
       <section className="py-14 border-y border-[var(--bone)]/15 mb-16">
         <CharReveal as="div" className="text-xs uppercase tracking-widest text-[var(--acid)] mb-6">
           ◉ Availability
         </CharReveal>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {availability.map((a, i) => (
+          {AVAILABILITY.map((a, i) => (
             <AvailCell key={a.q} a={a} i={i} />
           ))}
         </div>
       </section>
 
       <div className="grid grid-cols-12 gap-10">
-        {/* Form */}
         <div className="col-span-12 md:col-span-8">
           <CharReveal
             as="div"
@@ -222,7 +210,6 @@ export default function Contact() {
           </form>
         </div>
 
-        {/* Sidebar */}
         <aside className="col-span-12 md:col-span-4 space-y-12">
           <SidebarBlock
             label="Studio"
@@ -241,7 +228,6 @@ export default function Contact() {
               </div>
             }
           />
-
           <SidebarBlock
             label="Write"
             content={
@@ -269,7 +255,6 @@ export default function Contact() {
               </div>
             }
           />
-
           <SidebarBlock
             label="Elsewhere"
             content={
@@ -287,13 +272,12 @@ export default function Contact() {
         </aside>
       </div>
 
-      {/* FAQ */}
       <section className="mt-32 border-t border-[var(--bone)]/15 pt-16">
         <CharReveal as="div" className="text-xs uppercase tracking-widest text-[var(--acid)] mb-10">
           ◉ FAQ
         </CharReveal>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-14 gap-y-10">
-          {faq.map((f, i) => (
+          {FAQ.map((f, i) => (
             <FAQCard key={f.q} f={f} i={i} />
           ))}
         </div>
@@ -311,11 +295,3 @@ export default function Contact() {
     </main>
   );
 }
-
-import {
-  AvailCell,
-  InputField,
-  SelectField,
-  SidebarBlock,
-  FAQCard,
-} from "../components/contact/ContactComponents";

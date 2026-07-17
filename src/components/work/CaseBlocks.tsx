@@ -4,24 +4,45 @@ import { WordReveal, Counter } from "../../components/motion/Motion";
 import { useParallax, useClipReveal, useReveal } from "../../hooks/motionUtils";
 import { mergeRefs } from "../../hooks/useMergedRefs";
 
+/* Shared image with error fallback */
+function CaseImg({
+  src,
+  alt = "",
+  className = "",
+  width = 1600,
+  height = 1200,
+}: {
+  src?: string;
+  alt?: string;
+  className?: string;
+  width?: number;
+  height?: number;
+}) {
+  return (
+    <img
+      src={src}
+      alt={alt}
+      width={width}
+      height={height}
+      loading="lazy"
+      decoding="async"
+      onError={(e) => {
+        e.currentTarget.src = "/images/hero-ink.jpg";
+      }}
+      className={`w-full h-full object-cover ${className}`}
+    />
+  );
+}
+
 export const FullBleed = React.memo(function FullBleed({ b }: { b: CaseBlock }) {
-  const parallax = useParallax<HTMLElement>(0.15);
-  const clip = useClipReveal<HTMLElement>("h");
-  const mergedRef = mergeRefs(parallax, clip);
+  const mergedRef = mergeRefs(useParallax<HTMLElement>(0.15), useClipReveal<HTMLElement>("h"));
   return (
     <figure ref={mergedRef} className="my-20 md:my-32 -mx-6 md:-mx-10">
       <div className="relative aspect-[21/10] w-full overflow-hidden">
-        <img
+        <CaseImg
           src={b.src}
           alt={b.caption ?? ""}
-          onError={(e) => {
-            e.currentTarget.src = "/images/hero-ink.jpg";
-          }}
-          width={1600}
-          height={1200}
-          loading="lazy"
-          decoding="async"
-          className="w-full h-full object-cover transition-transform duration-[2s] hover:scale-105"
+          className="transition-transform duration-[2s] hover:scale-105"
         />
       </div>
       {b.caption && (
@@ -34,22 +55,13 @@ export const FullBleed = React.memo(function FullBleed({ b }: { b: CaseBlock }) 
 });
 
 export const ImgBlock = React.memo(function ImgBlock({ b }: { b: CaseBlock }) {
-  const clip = useClipReveal<HTMLElement>("v");
-  const mergedRef = mergeRefs(clip);
   return (
-    <figure ref={mergedRef} className="my-16 md:my-24 group">
+    <figure ref={useClipReveal<HTMLElement>("v")} className="my-16 md:my-24 group">
       <div className="relative aspect-[3/2] w-full overflow-hidden">
-        <img
+        <CaseImg
           src={b.src}
           alt={b.caption ?? ""}
-          onError={(e) => {
-            e.currentTarget.src = "/images/hero-ink.jpg";
-          }}
-          width={1600}
-          height={1200}
-          loading="lazy"
-          decoding="async"
-          className="w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-105"
+          className="transition-transform duration-[1.5s] group-hover:scale-105"
         />
       </div>
       {b.caption && (
@@ -64,36 +76,22 @@ export const ImgBlock = React.memo(function ImgBlock({ b }: { b: CaseBlock }) {
 export const ImgPair = React.memo(function ImgPair({ b }: { b: CaseBlock }) {
   const clip1 = useClipReveal<HTMLDivElement>("h", 0);
   const clip2 = useClipReveal<HTMLDivElement>("h", 0.2);
-  const m1 = mergeRefs(clip1);
-  const m2 = mergeRefs(clip2);
   return (
     <figure className="my-16 md:my-24 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-      <div ref={m1} className="relative aspect-[4/5] overflow-hidden group">
-        <img
+      <div ref={clip1} className="relative aspect-[4/5] overflow-hidden group">
+        <CaseImg
           src={b.src}
-          alt=""
-          onError={(e) => {
-            e.currentTarget.src = "/images/hero-ink.jpg";
-          }}
           width={800}
           height={1200}
-          loading="lazy"
-          decoding="async"
-          className="w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-110"
+          className="transition-transform duration-[1.5s] group-hover:scale-110"
         />
       </div>
-      <div ref={m2} className="relative aspect-[4/5] overflow-hidden group">
-        <img
+      <div ref={clip2} className="relative aspect-[4/5] overflow-hidden group">
+        <CaseImg
           src={b.src2}
-          alt=""
-          onError={(e) => {
-            e.currentTarget.src = "/images/hero-ink.jpg";
-          }}
           width={800}
           height={1200}
-          loading="lazy"
-          decoding="async"
-          className="w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-110"
+          className="transition-transform duration-[1.5s] group-hover:scale-110"
         />
       </div>
       {b.caption && (
@@ -106,11 +104,9 @@ export const ImgPair = React.memo(function ImgPair({ b }: { b: CaseBlock }) {
 });
 
 export const QuoteBlock = React.memo(function QuoteBlock({ b }: { b: CaseBlock }) {
-  const ref = useReveal<HTMLDivElement>();
-
   return (
     <div
-      ref={ref}
+      ref={useReveal<HTMLDivElement>()}
       className="reveal-group my-20 md:my-32 border-l-2 border-[var(--acid)] pl-6 md:pl-10"
     >
       <p className="font-display italic text-3xl md:text-5xl leading-tight mb-4">
@@ -158,7 +154,7 @@ export const StatsBlock = React.memo(function StatsBlock({ b }: { b: CaseBlock }
       ref={ref}
       className="my-20 md:my-28 grid grid-cols-2 md:grid-cols-4 gap-8 border-y border-[var(--bone)]/15 py-10"
     >
-      {b.items?.map((it: { label: string; value: string }, i: number) => {
+      {b.items?.map((it, i) => {
         const numeric = parseFloat(it.value.replace(/[^\d.]/g, ""));
         const isNumeric = !isNaN(numeric);
         const suffix = it.value.replace(/[\d.,]/g, "").trim();
@@ -181,12 +177,16 @@ export const StatsBlock = React.memo(function StatsBlock({ b }: { b: CaseBlock }
   );
 });
 
+const BLOCK_MAP: Record<string, React.ComponentType<{ b: CaseBlock }>> = {
+  "full-bleed": FullBleed,
+  image: ImgBlock,
+  "image-pair": ImgPair,
+  quote: QuoteBlock,
+  text: TextBlock,
+  stats: StatsBlock,
+};
+
 export const Block = React.memo(function Block({ b }: { b: CaseBlock }) {
-  if (b.type === "full-bleed") return <FullBleed b={b} />;
-  if (b.type === "image") return <ImgBlock b={b} />;
-  if (b.type === "image-pair") return <ImgPair b={b} />;
-  if (b.type === "quote") return <QuoteBlock b={b} />;
-  if (b.type === "text") return <TextBlock b={b} />;
-  if (b.type === "stats") return <StatsBlock b={b} />;
-  return null;
+  const Component = BLOCK_MAP[b.type];
+  return Component ? <Component b={b} /> : null;
 });

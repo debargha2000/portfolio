@@ -1,6 +1,6 @@
 @font-face {
-  font-family: 'Fraunces';
-  src: url('/fonts/Fraunces-Variable.woff2') format('woff2-variations');
+  font-family: "Fraunces";
+  src: url("/fonts/Fraunces-Variable.woff2") format("woff2-variations");
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
@@ -8,8 +8,8 @@
 }
 
 @font-face {
-  font-family: 'Fraunces';
-  src: url('/fonts/Fraunces-Variable-Italic.woff2') format('woff2-variations');
+  font-family: "Fraunces";
+  src: url("/fonts/Fraunces-Variable-Italic.woff2") format("woff2-variations");
   font-weight: 100 900;
   font-style: italic;
   font-display: swap;
@@ -17,40 +17,40 @@
 }
 
 @font-face {
-  font-family: 'Instrument Serif';
-  src: url('/fonts/InstrumentSerif-Regular.woff2') format('woff2');
+  font-family: "Instrument Serif";
+  src: url("/fonts/InstrumentSerif-Regular.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Instrument Serif';
-  src: url('/fonts/InstrumentSerif-Italic.woff2') format('woff2');
+  font-family: "Instrument Serif";
+  src: url("/fonts/InstrumentSerif-Italic.woff2") format("woff2");
   font-weight: 400;
   font-style: italic;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Inter Tight';
-  src: url('/fonts/InterTight-Variable.woff2') format('woff2-variations');
+  font-family: "Inter Tight";
+  src: url("/fonts/InterTight-Variable.woff2") format("woff2-variations");
   font-weight: 300 700;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'JetBrains Mono';
-  src: url('/fonts/JetBrainsMono-Regular.woff2') format('woff2');
+  font-family: "JetBrains Mono";
+  src: url("/fonts/JetBrainsMono-Regular.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'JetBrains Mono';
-  src: url('/fonts/JetBrainsMono-Medium.woff2') format('woff2');
+  font-family: "JetBrains Mono";
+  src: url("/fonts/JetBrainsMono-Medium.woff2") format("woff2");
   font-weight: 500;
   font-style: normal;
   font-display: swap;
@@ -60,7 +60,10 @@
   font-family: "Fraunces", "Instrument Serif", serif;
   font-weight: 300;
   letter-spacing: -0.03em;
-  font-variation-settings: "opsz" 144, "SOFT" 50, "WONK" 0;
+  font-variation-settings:
+    "opsz" 144,
+    "SOFT" 50,
+    "WONK" 0;
 }
 .font-display em {
   font-style: italic;
@@ -102,33 +105,12 @@
 }
 
 /* Display weight variants for Fraunces */
-.display-thin { font-weight: 200; }
-.display-light { font-weight: 300; }
-.display-regular { font-weight: 400; }
-.display-medium { font-weight: 500; }
-.display-bold { font-weight: 700; }
-.display-black { font-weight: 900; }
-
-/* Soft axis for Fraunces — softer (more rounded) */
-.display-soft {
-  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 0;
+.display-thin {
+  font-weight: 200;
 }
-/* Sharp axis for Fraunces — sharper (more angular) */
-.display-sharp {
-  font-variation-settings: "opsz" 144, "SOFT" 0, "WONK" 0;
+.display-light {
+  font-weight: 300;
 }
-/* Wonk axis — more character */
-.display-wonk {
-  font-variation-settings: "opsz" 144, "SOFT" 50, "WONK" 1;
-}
-
-/* Highlight words */
-.highlight-word {
-  transition: opacity 0.3s ease, color 0.3s ease;
-}
-
-/* Wave text */
-.wave-char {
-  display: inline-block;
-  transition: transform 0.1s ease;
+.display-regular {
+  font-weight: 400;
 }

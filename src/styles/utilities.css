@@ -17,18 +17,13 @@ html.lenis body {
   overscroll-behavior: contain;
 }
 
-
-/* Project card image warp container */
-.warp-img {
-  width: 100%;
-  height: 100%;
-  display: block;
-  object-fit: cover;
-}
-
 /* Project card: image zoom */
-.project-img { transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1); }
-.group:hover .project-img { transform: scale(1.08); }
+.project-img {
+  transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.group:hover .project-img {
+  transform: scale(1.08);
+}
 
 /* Card 3d tilt */
 .tilt-card {
@@ -36,14 +31,15 @@ html.lenis body {
   contain: layout style;
 }
 .tilt-card:hover {
-  box-shadow: 0 30px 80px -20px rgba(198,255,61,0.25);
+  box-shadow: 0 30px 80px -20px rgba(198, 255, 61, 0.25);
   will-change: transform;
 }
 
 /* Timeline progress line */
 .timeline-progress {
   position: absolute;
-  left: 0; top: 0;
+  left: 0;
+  top: 0;
   height: 100%;
   width: 2px;
   background: linear-gradient(180deg, var(--acid), var(--orange));
@@ -55,40 +51,12 @@ html.lenis body {
 .input-line {
   background: transparent;
   border: 0;
-  border-bottom: 1px solid rgba(244,241,234,0.2);
+  border-bottom: 1px solid rgba(244, 241, 234, 0.2);
   outline: none;
   transition: border-color 0.3s ease;
 }
-.input-line:focus { border-color: var(--acid); }
-
-/* Scroll progress bar */
-.scroll-progress {
-  position: fixed;
-  top: 0; left: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--acid), var(--orange), var(--acid));
-  z-index: 100;
-  transform-origin: left;
-  transform: scaleX(0);
-  transition: transform 0.1s linear;
-  box-shadow: 0 0 10px var(--acid);
-}
-
-/* Horizontal scroll section */
-.horizontal-scroll {
-  display: flex;
-  gap: 2rem;
-  will-change: transform;
-}
-
-/* Sticky scroll */
-.sticky-scroll {
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.input-line:focus {
+  border-color: var(--acid);
 }
 
 /* Big next-project hover */
@@ -105,51 +73,65 @@ html.lenis body {
   transition: transform 0.8s cubic-bezier(0.77, 0, 0.175, 1);
   z-index: 0;
 }
-.next-project-link:hover .np-bg { transform: translateY(0); }
+.next-project-link:hover .np-bg {
+  transform: translateY(0);
+}
 .next-project-link .np-text {
   position: relative;
   z-index: 1;
   transition: color 0.4s ease;
 }
-.next-project-link:hover .np-text { color: var(--bg); }
+.next-project-link:hover .np-text {
+  color: var(--bg);
+}
 
 /* FAQ smooth open */
-details.faq { border-bottom: 1px solid rgba(244,241,234,0.1); }
-details.faq summary { list-style: none; cursor: pointer; }
-details.faq summary::-webkit-details-marker { display: none; }
+details.faq {
+  border-bottom: 1px solid rgba(244, 241, 234, 0.1);
+}
+details.faq summary {
+  list-style: none;
+  cursor: pointer;
+}
+details.faq summary::-webkit-details-marker {
+  display: none;
+}
 details.faq .faq-body {
   overflow: hidden;
   max-height: 0;
   transition: max-height 0.6s cubic-bezier(0.77, 0, 0.175, 1);
 }
-details.faq[open] .faq-body { max-height: 400px; }
-details.faq .faq-plus { transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1); }
-details.faq[open] .faq-plus { transform: rotate(135deg); }
+details.faq[open] .faq-body {
+  max-height: 400px;
+}
+details.faq .faq-plus {
+  transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1);
+}
+details.faq[open] .faq-plus {
+  transform: rotate(135deg);
+}
 
 /* Hero text stroke morph */
 .hero-morph-text {
-  text-shadow: 
-    -1px -1px 0 #000,  
-     1px -1px 0 #000,
-    -1px  1px 0 #000,
-     1px  1px 0 #000;
-}
-.no-stroke {
-  text-shadow: none;
+  text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
 }
 .white-stroke {
-  text-shadow: 
-    -1px -1px 0 #fff,  
-     1px -1px 0 #fff,
-    -1px  1px 0 #fff,
-     1px  1px 0 #fff;
+  text-shadow:
+    -1px -1px 0 #fff,
+    1px -1px 0 #fff,
+    -1px 1px 0 #fff,
+    1px 1px 0 #fff;
 }
 .black-stroke {
-  text-shadow: 
-    -1px -1px 0 #000,  
-     1px -1px 0 #000,
-    -1px  1px 0 #000,
-     1px  1px 0 #000;
+  text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
 }
 
 /* Chip / Button */

@@ -1,6 +1,6 @@
 import React from "react";
 import { Magnetic } from "../../components/motion/Motion";
-import { useCircleReveal, useReveal } from "../../hooks/motionUtils";
+import { useClipReveal, useReveal } from "../../hooks/motionUtils";
 import { mergeRefs } from "../../hooks/useMergedRefs";
 
 const PressQuote = React.memo(function PressQuote({
@@ -11,7 +11,7 @@ const PressQuote = React.memo(function PressQuote({
   i: number;
 }) {
   const ref = useReveal<HTMLDivElement>();
-  const circle = useCircleReveal<HTMLDivElement>(i * 0.1);
+  const circle = useClipReveal<HTMLDivElement>("circle", i * 0.1);
 
   return (
     <figure

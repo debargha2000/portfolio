@@ -1,7 +1,6 @@
 import React from "react";
 import { Scramble } from "../../components/motion/Motion";
 import { useClipReveal, useReveal } from "../../hooks/motionUtils";
-import { mergeRefs } from "../../hooks/useMergedRefs";
 
 export const AvailCell = React.memo(function AvailCell({
   a,
@@ -10,11 +9,9 @@ export const AvailCell = React.memo(function AvailCell({
   a: { q: string; s: string; c: string; pulse: boolean };
   i: number;
 }) {
-  const clip = useClipReveal<HTMLDivElement>("v", i * 0.1);
-  const mergedRef = mergeRefs(clip);
   return (
     <div
-      ref={mergedRef}
+      ref={useClipReveal<HTMLDivElement>("v", i * 0.1)}
       className={`${a.c} ${a.pulse ? "slot-pulse" : ""} px-6 py-5 group hover:scale-105 transition-transform duration-500`}
     >
       <div className="text-xs uppercase tracking-widest mb-1 opacity-80">{a.q}</div>
@@ -24,6 +21,36 @@ export const AvailCell = React.memo(function AvailCell({
     </div>
   );
 });
+
+/* Shared field wrapper for label + error pattern */
+function FieldWrapper({
+  label,
+  name,
+  error,
+  children,
+}: {
+  label: string;
+  name?: string;
+  error?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <label className="block group">
+      <span className="text-xs uppercase tracking-widest text-[var(--bone)]/50 group-focus-within:text-[var(--acid)] transition-colors">
+        {label}
+      </span>
+      {children}
+      {error && (
+        <span
+          id={name ? `${name}-err` : undefined}
+          className="text-xs text-[var(--rust)] mt-1 block"
+        >
+          {error}
+        </span>
+      )}
+    </label>
+  );
+}
 
 export const InputField = React.memo(function InputField({
   label,
@@ -41,10 +68,7 @@ export const InputField = React.memo(function InputField({
   error?: string;
 }) {
   return (
-    <label className="block group">
-      <span className="text-xs uppercase tracking-widest text-[var(--bone)]/50 group-focus-within:text-[var(--acid)] transition-colors">
-        {label}
-      </span>
+    <FieldWrapper label={label} name={name} error={error}>
       <input
         required={required}
         value={value}
@@ -53,12 +77,7 @@ export const InputField = React.memo(function InputField({
         aria-describedby={error ? `${name}-err` : undefined}
         className="input-line w-full py-3 text-lg font-display"
       />
-      {error && (
-        <span id={`${name}-err`} className="text-xs text-[var(--rust)] mt-1 block">
-          {error}
-        </span>
-      )}
-    </label>
+    </FieldWrapper>
   );
 });
 
@@ -74,10 +93,7 @@ export const SelectField = React.memo(function SelectField({
   options: { v: string; l: string }[];
 }) {
   return (
-    <label className="block group">
-      <span className="text-xs uppercase tracking-widest text-[var(--bone)]/50 group-focus-within:text-[var(--acid)] transition-colors">
-        {label}
-      </span>
+    <FieldWrapper label={label}>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -89,7 +105,7 @@ export const SelectField = React.memo(function SelectField({
           </option>
         ))}
       </select>
-    </label>
+    </FieldWrapper>
   );
 });
 
@@ -102,10 +118,8 @@ export const SidebarBlock = React.memo(function SidebarBlock({
   content: React.ReactNode;
   extra?: React.ReactNode;
 }) {
-  const clip = useClipReveal<HTMLDivElement>("h");
-  const mergedRef = mergeRefs(clip);
   return (
-    <div ref={mergedRef}>
+    <div ref={useClipReveal<HTMLDivElement>("h")}>
       <div className="text-xs uppercase tracking-widest text-[var(--acid)] mb-4">◉ {label}</div>
       {content}
       {extra}
@@ -120,10 +134,9 @@ export const FAQCard = React.memo(function FAQCard({
   f: { q: string; a: string };
   i: number;
 }) {
-  const ref = useReveal<HTMLDivElement>(i * 0.1);
   return (
     <div
-      ref={ref}
+      ref={useReveal<HTMLDivElement>(i * 0.1)}
       className="border-t border-[var(--bone)]/15 pt-6 group hover:border-[var(--acid)] transition-colors"
     >
       <h4 className="font-display text-2xl md:text-3xl mb-3 group-hover:text-[var(--acid)] transition-colors">

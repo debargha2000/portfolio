@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import { CharReveal, WordReveal, Scramble } from "../../components/motion/Motion";
 import { useParallax, useTilt, useClipReveal, useReveal } from "../../hooks/motionUtils";
 import { mergeRefs } from "../../hooks/useMergedRefs";
@@ -6,25 +6,7 @@ import type { Movement as MovementT, Engagement, FAQ } from "../../data/types";
 
 export const Movement = React.memo(function Movement({ m }: { m: MovementT; i: number }) {
   const parallax = useParallax<HTMLDivElement>(0.3);
-  const panelRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const el = panelRef.current;
-    if (!el) return;
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReducedMotion) return;
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          el.classList.add("is-visible");
-          obs.disconnect();
-        }
-      },
-      { rootMargin: "0px 0px -15% 0px" }
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
+  const panelRef = useReveal<HTMLElement>();
 
   return (
     <article
@@ -40,7 +22,6 @@ export const Movement = React.memo(function Movement({ m }: { m: MovementT; i: n
           backgroundPosition: "center",
         }}
       />
-
       <div className="col-span-12 md:col-span-3 relative z-10">
         <div
           className="mv-item reveal-fade font-display italic text-8xl md:text-[10rem] text-[var(--acid)] leading-none group-hover:rotate-[-15deg] group-hover:scale-110 transition-all duration-700 inline-block origin-bottom-left"
@@ -68,7 +49,6 @@ export const Movement = React.memo(function Movement({ m }: { m: MovementT; i: n
         >
           {m.desc}
         </WordReveal>
-
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-10">
           <div className="mv-item reveal-fade" style={{ transitionDelay: "0.15s" }}>
             <CharReveal
@@ -99,7 +79,6 @@ export const Movement = React.memo(function Movement({ m }: { m: MovementT; i: n
             <p className="text-[var(--bone)]/80">{m.tools}</p>
           </div>
         </div>
-
         <blockquote
           className="mv-item reveal-fade border-l-2 border-[var(--bone)]/30 pl-6 max-w-2xl hover:border-[var(--acid)] transition-colors"
           style={{ transitionDelay: "0.25s" }}
@@ -114,10 +93,10 @@ export const Movement = React.memo(function Movement({ m }: { m: MovementT; i: n
 });
 
 export const PricingCard = React.memo(function PricingCard({ e, i }: { e: Engagement; i: number }) {
-  const tilt = useTilt<HTMLDivElement>(8);
-  const clip = useClipReveal<HTMLDivElement>("v", i * 0.1);
-  const mergedRef = mergeRefs(tilt, clip);
-
+  const mergedRef = mergeRefs(
+    useTilt<HTMLDivElement>(8),
+    useClipReveal<HTMLDivElement>("v", i * 0.1)
+  );
   return (
     <div
       ref={mergedRef}
@@ -142,9 +121,8 @@ export const PricingCard = React.memo(function PricingCard({ e, i }: { e: Engage
 });
 
 export const FAQItem = React.memo(function FAQItem({ f, i }: { f: FAQ; i: number }) {
-  const ref = useReveal<HTMLDetailsElement>(i * 0.08);
   return (
-    <details ref={ref} className="faq group py-6">
+    <details ref={useReveal<HTMLDetailsElement>(i * 0.08)} className="faq group py-6">
       <summary className="flex justify-between items-baseline gap-4">
         <span className="font-display text-2xl md:text-4xl group-hover:text-[var(--acid)] transition-colors">
           <Scramble>{f.q}</Scramble>

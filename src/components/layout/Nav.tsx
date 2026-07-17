@@ -4,6 +4,20 @@ import { Scramble } from "../../components/motion/Motion";
 import { useMagnetic } from "../../hooks/motionUtils";
 import { useFocusTrap } from "../../hooks/useFocusTrap";
 
+const NAV_LINKS = [
+  { to: "/", l: "Home" },
+  { to: "/work", l: "Work" },
+  { to: "/studio", l: "Studio" },
+  { to: "/process", l: "Process" },
+  { to: "/contact", l: "Contact" },
+] as const;
+
+const SOCIALS = [
+  { href: "https://twitter.com", l: "Twitter" },
+  { href: "https://instagram.com", l: "Instagram" },
+  { href: "https://linkedin.com", l: "LinkedIn" },
+] as const;
+
 export default function Nav() {
   const mag = useMagnetic<HTMLAnchorElement>(0.2);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -21,7 +35,6 @@ export default function Nav() {
       ticking = true;
       requestAnimationFrame(() => {
         setScrolled(window.scrollY > 0);
-        // ponytail: assume hero is ~50vh for simple scroll reveal
         setScrolledPastHero(window.scrollY > window.innerHeight * 0.5);
         ticking = false;
       });
@@ -31,16 +44,10 @@ export default function Nav() {
   }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMenuOpen(false);
-  }, [location]);
-
+  }, [location]); // eslint-disable-line react-hooks/set-state-in-effect
   useEffect(() => {
-    if (menuOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
+    document.body.style.overflow = menuOpen ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
     };
@@ -65,13 +72,7 @@ export default function Nav() {
         <ul
           className={`hidden md:flex items-center gap-8 font-mono text-[10px] uppercase tracking-[0.25em] font-medium transition-all duration-700 ease-out ${isHome && !scrolledPastHero ? "opacity-0 -translate-y-4 pointer-events-none" : "opacity-100 translate-y-0"}`}
         >
-          {[
-            { to: "/", l: "Home" },
-            { to: "/work", l: "Work" },
-            { to: "/studio", l: "Studio" },
-            { to: "/process", l: "Process" },
-            { to: "/contact", l: "Contact" },
-          ].map((i) => (
+          {NAV_LINKS.map((i) => (
             <li key={i.to}>
               <Link
                 to={i.to}
@@ -100,7 +101,7 @@ export default function Nav() {
         </button>
       </nav>
 
-      {/* Mobile Menu Overlay */}
+      {/* Mobile Menu */}
       <div
         ref={menuRef}
         id="mobile-menu"
@@ -126,13 +127,7 @@ export default function Nav() {
           </button>
         </div>
         <div className="flex flex-col justify-center h-full px-6 gap-6">
-          {[
-            { to: "/", l: "Home" },
-            { to: "/work", l: "Work" },
-            { to: "/studio", l: "Studio" },
-            { to: "/process", l: "Process" },
-            { to: "/contact", l: "Contact" },
-          ].map((i, idx) => (
+          {NAV_LINKS.map((i, idx) => (
             <Link
               key={i.to}
               to={i.to}
@@ -146,30 +141,17 @@ export default function Nav() {
             </Link>
           ))}
           <div className="mt-8 border-t border-[var(--bone)]/10 pt-8 flex gap-4">
-            <a
-              href="https://twitter.com"
-              target="_blank"
-              rel="noreferrer"
-              className="text-xs uppercase tracking-widest text-[var(--bone)]/60"
-            >
-              Twitter
-            </a>
-            <a
-              href="https://instagram.com"
-              target="_blank"
-              rel="noreferrer"
-              className="text-xs uppercase tracking-widest text-[var(--bone)]/60"
-            >
-              Instagram
-            </a>
-            <a
-              href="https://linkedin.com"
-              target="_blank"
-              rel="noreferrer"
-              className="text-xs uppercase tracking-widest text-[var(--bone)]/60"
-            >
-              LinkedIn
-            </a>
+            {SOCIALS.map((s) => (
+              <a
+                key={s.l}
+                href={s.href}
+                target="_blank"
+                rel="noreferrer"
+                className="text-xs uppercase tracking-widest text-[var(--bone)]/60"
+              >
+                {s.l}
+              </a>
+            ))}
           </div>
         </div>
       </div>

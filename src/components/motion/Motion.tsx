@@ -1,8 +1,28 @@
 import { useEffect, useRef } from "react";
-import { useMagnetic, useScramble, useCountUp } from "../../hooks/motionUtils";
+import {
+  useMagnetic,
+  useScramble,
+  useCountUp,
+  prefersReducedMotion,
+} from "../../hooks/motionUtils";
 
-function prefersReducedMotion(): boolean {
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+/* --- Shared reveal observer for text components --- */
+function useTextRevealObserver(ref: React.RefObject<HTMLElement | null>) {
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || prefersReducedMotion()) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.classList.add("is-visible");
+          obs.disconnect();
+        }
+      },
+      { rootMargin: "0px 0px -12% 0px" }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [ref]);
 }
 
 /* --- Character-by-character reveal --- */
@@ -18,42 +38,25 @@ export function CharReveal({
   stagger?: number;
 }) {
   const ref = useRef<HTMLElement>(null);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || prefersReducedMotion()) return;
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          el.classList.add("is-visible");
-          obs.disconnect();
-        }
-      },
-      { rootMargin: "0px 0px -12% 0px" }
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
-
-  const nodes = children.split("").map((ch, i) =>
-    ch === " " ? (
-      <span key={i} style={{ display: "inline-block", width: "0.3em" }}>
-        &nbsp;
-      </span>
-    ) : (
-      <span
-        key={i}
-        className="c inline-block reveal-fade"
-        style={{ transitionDelay: `${i * stagger}s` }}
-      >
-        {ch}
-      </span>
-    )
-  );
-
+  useTextRevealObserver(ref);
   const Component = Tag as React.ElementType;
   return (
     <Component ref={ref} className={`${className} reveal-group`} aria-label={children}>
-      {nodes}
+      {children.split("").map((ch, i) =>
+        ch === " " ? (
+          <span key={i} style={{ display: "inline-block", width: "0.3em" }}>
+            &nbsp;
+          </span>
+        ) : (
+          <span
+            key={i}
+            className="c inline-block reveal-fade"
+            style={{ transitionDelay: `${i * stagger}s` }}
+          >
+            {ch}
+          </span>
+        )
+      )}
     </Component>
   );
 }
@@ -69,42 +72,25 @@ export function WordReveal({
   as?: keyof HTMLElementTagNameMap;
 }) {
   const ref = useRef<HTMLElement>(null);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || prefersReducedMotion()) return;
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          el.classList.add("is-visible");
-          obs.disconnect();
-        }
-      },
-      { rootMargin: "0px 0px -12% 0px" }
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
-
-  const nodes = children.split(" ").map((w, i) => {
-    const isMoriarty =
-      w.replace(/[^a-zA-Z]/g, "") === "Moriarty" || w.replace(/[^a-zA-Z]/g, "") === "Moriatry";
-    return (
-      <span
-        key={i}
-        className="w inline-block mr-[0.25em] reveal-fade"
-        style={{ transitionDelay: `${i * 0.04}s` }}
-      >
-        <span className={`inline-block ${isMoriarty ? "text-[var(--orange)]" : ""}`}>
-          {w.replace("Moriatry", "Moriarty")}
-        </span>
-      </span>
-    );
-  });
-
+  useTextRevealObserver(ref);
   const Component = Tag as React.ElementType;
   return (
     <Component ref={ref} className={`${className} reveal-group`}>
-      {nodes}
+      {children.split(" ").map((w, i) => {
+        const isMoriarty =
+          w.replace(/[^a-zA-Z]/g, "") === "Moriarty" || w.replace(/[^a-zA-Z]/g, "") === "Moriatry";
+        return (
+          <span
+            key={i}
+            className="w inline-block mr-[0.25em] reveal-fade"
+            style={{ transitionDelay: `${i * 0.04}s` }}
+          >
+            <span className={`inline-block ${isMoriarty ? "text-[var(--orange)]" : ""}`}>
+              {w.replace("Moriatry", "Moriarty")}
+            </span>
+          </span>
+        );
+      })}
     </Component>
   );
 }
@@ -133,7 +119,7 @@ export function Counter({
   );
 }
 
-/* --- Magnetic wrapper for children --- */
+/* --- Magnetic wrapper --- */
 export function Magnetic({
   children,
   className = "",
@@ -166,7 +152,6 @@ export function Scramble({
 }) {
   const ref = useRef<HTMLElement>(null);
   const { scramble, reset } = useScramble();
-
   const Component = Tag as React.ElementType;
   return (
     <Component

@@ -2,45 +2,29 @@ import { useEffect, useRef } from "react";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
 
 export default function CursorOverlay() {
-  const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
-  const isTouchDevice = useMediaQuery('(hover: none) and (pointer: coarse)');
-  const shouldDisable = prefersReducedMotion || isTouchDevice;
-
+  const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
+  const touchDevice = useMediaQuery("(hover: none) and (pointer: coarse)");
+  const disabled = reducedMotion || touchDevice;
   const glow = useRef<HTMLDivElement>(null);
   const dot = useRef<HTMLDivElement>(null);
   const ring = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (shouldDisable) return;
+    if (disabled) return;
 
-    const mx = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-    const rx = { x: mx.x, y: mx.y };
-    let gx = mx.x;
-    let gy = mx.y;
-    let cx = gx;
-    let cy = gy;
-
-    let running = false;
-    let raf = 0;
-    let willChangeTimer: ReturnType<typeof setTimeout> | null = null;
-
-    const setWillChange = (active: boolean) => {
-      const val = active ? "transform" : "auto";
-      if (dot.current) dot.current.style.willChange = val;
-      if (ring.current) ring.current.style.willChange = val;
-      if (glow.current) glow.current.style.willChange = val;
-    };
+    // mx = mouse (instant), rx = ring (lerped), cx/cy = glow (lerped)
+    let mx = window.innerWidth / 2,
+      my = mx,
+      rx = mx,
+      ry = my,
+      cx = mx,
+      cy = my;
+    let running = false,
+      raf = 0;
 
     const onMove = (e: MouseEvent) => {
-      mx.x = e.clientX;
-      mx.y = e.clientY;
-      gx = e.clientX;
-      gy = e.clientY;
-
-      if (willChangeTimer) clearTimeout(willChangeTimer);
-      setWillChange(true);
-      willChangeTimer = setTimeout(() => setWillChange(false), 3000);
-
+      mx = cx = e.clientX;
+      my = cy = e.clientY;
       if (!running) {
         running = true;
         raf = requestAnimationFrame(loop);
@@ -48,16 +32,17 @@ export default function CursorOverlay() {
     };
 
     const loop = () => {
-      rx.x += (mx.x - rx.x) * 0.15;
-      rx.y += (mx.y - rx.y) * 0.15;
-      cx += (gx - cx) * 0.15;
-      cy += (gy - cy) * 0.15;
-
-      if (dot.current) dot.current.style.transform = `translate3d(${mx.x}px, ${mx.y}px, 0) translate(-50%, -50%)`;
-      if (ring.current) ring.current.style.transform = `translate3d(${rx.x}px, ${rx.y}px, 0) translate(-50%, -50%)`;
-      if (glow.current) glow.current.style.transform = `translate3d(${cx}px, ${cy}px, 0) translate(-50%, -50%)`;
-
-      if (Math.abs(mx.x - rx.x) < 0.1 && Math.abs(mx.y - rx.y) < 0.1 && Math.abs(gx - cx) < 0.1 && Math.abs(gy - cy) < 0.1) {
+      rx += (mx - rx) * 0.15;
+      ry += (my - ry) * 0.15;
+      cx += (mx - cx) * 0.15;
+      cy += (my - cy) * 0.15;
+      if (dot.current)
+        dot.current.style.transform = `translate3d(${mx}px, ${my}px, 0) translate(-50%, -50%)`;
+      if (ring.current)
+        ring.current.style.transform = `translate3d(${rx}px, ${ry}px, 0) translate(-50%, -50%)`;
+      if (glow.current)
+        glow.current.style.transform = `translate3d(${cx}px, ${cy}px, 0) translate(-50%, -50%)`;
+      if (Math.abs(mx - rx) < 0.1 && Math.abs(my - ry) < 0.1) {
         running = false;
         return;
       }
@@ -67,18 +52,10 @@ export default function CursorOverlay() {
     const onOver = (e: MouseEvent) => {
       const t = e.target as HTMLElement;
       if (!t) return;
-      const interactive = t.closest("a, button, [data-cursor='hover']");
-      if (interactive) ring.current?.classList.add("hover");
-      else ring.current?.classList.remove("hover");
-
-      const inHero = t.closest(".hero-section");
-      if (inHero) {
-        dot.current?.classList.add("in-hero");
-        ring.current?.classList.add("in-hero");
-      } else {
-        dot.current?.classList.remove("in-hero");
-        ring.current?.classList.remove("in-hero");
-      }
+      ring.current?.classList.toggle("hover", !!t.closest("a, button, [data-cursor='hover']"));
+      const inHero = !!t.closest(".hero-section");
+      dot.current?.classList.toggle("in-hero", inHero);
+      ring.current?.classList.toggle("in-hero", inHero);
     };
 
     window.addEventListener("mousemove", onMove, { passive: true });
@@ -87,13 +64,10 @@ export default function CursorOverlay() {
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("mouseover", onOver);
       cancelAnimationFrame(raf);
-      if (willChangeTimer) clearTimeout(willChangeTimer);
-      setWillChange(false);
     };
-  }, [shouldDisable]);
+  }, [disabled]);
 
-  if (shouldDisable) return null;
-
+  if (disabled) return null;
   return (
     <>
       <div ref={glow} className="cursor-glow hidden md:block" style={{ pointerEvents: "none" }} />
