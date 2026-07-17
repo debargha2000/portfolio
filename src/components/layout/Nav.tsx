@@ -43,9 +43,11 @@ export default function Nav() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  useEffect(() => {
+  const [prevPath, setPrevPath] = useState(location.pathname);
+  if (location.pathname !== prevPath) {
+    setPrevPath(location.pathname);
     setMenuOpen(false);
-  }, [location]); // eslint-disable-line react-hooks/set-state-in-effect
+  }
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
     return () => {
